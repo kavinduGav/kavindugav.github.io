@@ -1,0 +1,139 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import MediaPlaceholder from "../components/MediaPlaceholder.astro";
+import DownloadCvButton from "../components/DownloadCvButton.astro";
+import { siteConfig } from "../lib/config";
+
+const stack = [
+  { label: "BACKEND", items: ["Node.js", "Express", "Prisma", "REST APIs", "Microservices"] },
+  { label: "FRONTEND & MOBILE", items: ["React", "Next.js", "Flutter", "SwiftUI", "Tailwind"] },
+  { label: "DATA", items: ["PostgreSQL", "MySQL", "MongoDB", "Firebase"] },
+  { label: "CLOUD & DEVOPS", items: ["AWS EC2", "Docker", "Kubernetes", "Git"] },
+  { label: "AUTOMATION & AI", items: ["n8n", "AI agents", "Python", "FastAPI"] },
+  { label: "LANGUAGES", items: ["TypeScript", "JavaScript", "Dart", "Java", "Swift"] },
+];
+
+const experience = [
+  {
+    date: "Oct 2025 – now",
+    role: "Associate Software Engineer · OREL Group",
+    description: "Backend APIs, Flutter apps for 3,000+ daily users, AWS deployments, architecture planning with a 15-person team.",
+    current: true,
+  },
+  {
+    date: "Jan – Sep 2025",
+    role: "Software Engineer Intern · OREL Group",
+    description: "REST APIs with Node.js and PostgreSQL; schema design with Prisma in an Agile team.",
+  },
+  {
+    date: "2022 – 2026",
+    role: "BSc (Hons) IT, Software Engineering · SLIIT",
+  },
+  {
+    date: "2019 – 2022",
+    role: "Banking · Sampath Bank, HNB",
+  },
+];
+---
+
+<BaseLayout
+  title="About"
+  description="Kavindu Gavesha — Associate Software Engineer at OREL Group, Colombo. Backend, full-stack and Flutter mobile."
+>
+  <header class="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-10 px-5 py-10 sm:px-10 min-[900px]:grid-cols-2 min-[900px]:py-9">
+    <div class="flex flex-col gap-5">
+      <h1
+        data-hero-heading
+        class="font-heading text-[clamp(36px,5vw,60px)] font-extrabold uppercase leading-none tracking-[-0.03em]"
+      >
+        Hi, I'm <span class="text-accent-text">Kavindu</span>.
+      </h1>
+      <p class="max-w-[560px] text-lg leading-[1.6] text-text-2">
+        I'm an Associate Software Engineer at OREL Group in Colombo. I build backend services in Node.js and
+        TypeScript, full-stack platforms in React and Next.js, and Flutter apps used by thousands of people every
+        day.
+      </p>
+      <p class="max-w-[560px] text-lg leading-[1.6] text-muted">
+        I graduated from SLIIT in Software Engineering, and my final-year research on canine biometrics was
+        accepted for publication in IJACSA.
+      </p>
+      <div class="flex flex-wrap items-center gap-2.5">
+        <DownloadCvButton />
+        <a
+          href={siteConfig.social.github}
+          target="_blank"
+          rel="noopener"
+          class="group inline-flex items-center gap-1.5 rounded-pill border border-border-strong px-[22px] py-3.5 font-medium text-text transition-[border-color,transform] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent active:translate-y-0 active:scale-95"
+        >
+          GitHub
+          <span class="inline-block transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
+        </a>
+      </div>
+    </div>
+    <div class="w-full rounded-card border border-border bg-surface p-3.5 min-[900px]:max-w-[460px] min-[900px]:justify-self-end">
+      <MediaPlaceholder aspect="4/5" caption="portrait: b/w photo" />
+    </div>
+  </header>
+
+  <section class="mx-auto flex max-w-[1280px] flex-col gap-5 px-5 pb-16 sm:px-10">
+    <h2 class="font-heading text-[28px] font-bold">Stack</h2>
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {stack.map((group) => (
+        <div class="reveal-item flex flex-col gap-3 rounded-card border border-border bg-surface p-5">
+          <span class="font-mono text-xs text-accent-text">{group.label}</span>
+          <div class="flex flex-wrap gap-1.5 text-[13px]">
+            {group.items.map((item) => (
+              <span class="rounded-pill border border-border-strong px-3 py-1.5">{item}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="mx-auto flex max-w-[1280px] flex-col gap-5 px-5 pb-10 sm:px-10">
+    <h2 class="font-heading text-[28px] font-bold">Experience</h2>
+    <div class="flex flex-col border-t border-divider">
+      {experience.map((item) => (
+        <div class="reveal-item grid grid-cols-1 gap-1.5 border-b border-divider py-[22px] sm:grid-cols-[160px_1fr] sm:items-baseline sm:gap-6">
+          <span class:list={["font-mono text-[13px]", item.current ? "text-accent-text" : "text-subtle"]}>{item.date}</span>
+          <div>
+            <div class="text-[19px] font-bold">{item.role}</div>
+            {item.description && <div class="mt-1 text-[15px] leading-[1.55] text-muted">{item.description}</div>}
+          </div>
+        </div>
+      ))}
+    </div>
+    <p class="mt-2 text-sm text-faint">
+      Off the keyboard: former pro VALORANT player (Supreme Sports, 2023–25), badminton, cricket.
+    </p>
+  </section>
+</BaseLayout>
+
+<script>
+  import { ensureGsapRegistered, prefersReducedMotion, gsap, SplitText, popInEach, cleanupScrollTriggers } from "../lib/animations";
+
+  function initAboutAnimations() {
+    ensureGsapRegistered();
+
+    const heading = document.querySelector<HTMLElement>("[data-hero-heading]");
+    const items = document.querySelectorAll(".reveal-item");
+
+    if (prefersReducedMotion()) return;
+
+    if (heading) {
+      const split = SplitText.create(heading, { type: "lines", linesClass: "line" });
+      gsap.fromTo(
+        split.lines,
+        { yPercent: 115, autoAlpha: 0 },
+        { yPercent: 0, autoAlpha: 1, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.1 },
+      );
+    }
+
+    if (items.length) popInEach(items);
+  }
+
+  initAboutAnimations();
+  document.addEventListener("astro:before-swap", cleanupScrollTriggers);
+  document.addEventListener("astro:page-load", initAboutAnimations);
+</script>
