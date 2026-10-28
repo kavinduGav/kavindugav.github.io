@@ -30,9 +30,22 @@ function createGridParallax() {
   });
 }
 
-function refresh() {
-  lenis?.resize();
-  ScrollTrigger.refresh();
+/**
+ * Lenis keeps its own internal scroll target across Astro's page swaps (the
+ * whole point of the singleton — the ambient audio etc. survive navigation),
+ * but that means after a real navigation it's still holding the *old*
+ * page's scroll position. Astro resets window.scrollY itself, but on
+ * Lenis's next raf tick it was re-applying its stale target and fighting
+ * that reset, leaving the new page scrolled down. Force Lenis back in sync
+ * with wherever the new page should actually start.
+ */
+function syncScrollPosition() {
+  if (!lenis) return;
+  if (location.hash) {
+    lenis.scrollTo(location.hash, { immediate: true, force: true });
+  } else {
+    lenis.scrollTo(0, { immediate: true, force: true });
+  }
 }
 
 /** Tier in the nav order, for deciding which way a page transition should slide. -1 = not in the nav (e.g. 404). */
@@ -93,5 +106,7 @@ export function initPageScroll() {
   initSmoothScroll();
   createProgressBar();
   createGridParallax();
-  refresh();
+  lenis?.resize();
+  syncScrollPosition();
+  ScrollTrigger.refresh();
 }
