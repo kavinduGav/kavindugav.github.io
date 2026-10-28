@@ -97,6 +97,33 @@ export function popInEach(targets: string | NodeListOf<Element>, opts: { start?:
   });
 }
 
+/**
+ * Draws a row's divider line left-to-right, then fades its content in —
+ * for rows with a ".row-divider" line element and ".row-content" pieces.
+ */
+export function animateDividerRows(targets: string | NodeListOf<Element>, opts: { start?: string } = {}) {
+  const all = (typeof targets === "string" ? gsap.utils.toArray<HTMLElement>(targets) : Array.from(targets)) as HTMLElement[];
+  const rows = all.filter((el) => !el.dataset.dividerBound);
+
+  rows.forEach((row) => {
+    row.dataset.dividerBound = "true";
+    const divider = row.querySelector<HTMLElement>(".row-divider");
+    const content = row.querySelectorAll<HTMLElement>(".row-content");
+    const tl = gsap.timeline({
+      scrollTrigger: { trigger: row, start: opts.start ?? "top 90%", toggleActions: "play none none reverse" },
+    });
+    if (divider) tl.fromTo(divider, { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.inOut" });
+    if (content.length) {
+      tl.fromTo(
+        content,
+        { autoAlpha: 0, y: 12 },
+        { autoAlpha: 1, y: 0, duration: 0.4, stagger: 0.06, ease: "power2.out" },
+        divider ? "-=0.15" : 0,
+      );
+    }
+  });
+}
+
 export function cleanupScrollTriggers() {
   ScrollTrigger.getAll().forEach((st) => st.kill());
 }
