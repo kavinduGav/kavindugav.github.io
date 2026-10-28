@@ -146,6 +146,11 @@ body {
     linear-gradient(var(--grid) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid) 1px, transparent 1px);
   background-size: 48px 48px;
+  /* Single shorthand value applies to every background layer uniformly —
+     animating this one custom property (see src/lib/scroll.ts) avoids the
+     multi-layer background-position interpolation GSAP otherwise has to
+     guess at when a background has more than one image. */
+  background-position: 0 var(--grid-shift, 0px);
 }
 
 /* Keep the default view-transition cross-fade off the root; the theme
@@ -161,4 +166,65 @@ body {
 [data-hero-heading] .line {
   display: block;
   overflow: hidden;
+}
+
+/* Directional page-transition slide, keyed off data-nav-direction (set in
+   src/lib/scroll.ts right before the swap). Scoped to the attribute so it
+   never fires during the theme toggle's own unrelated view transition,
+   which never sets this attribute. */
+@keyframes slide-out-left {
+  to {
+    transform: translateX(-48px);
+    opacity: 0;
+  }
+}
+@keyframes slide-in-right {
+  from {
+    transform: translateX(48px);
+    opacity: 0;
+  }
+}
+@keyframes slide-out-right {
+  to {
+    transform: translateX(48px);
+    opacity: 0;
+  }
+}
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-48px);
+    opacity: 0;
+  }
+}
+:root[data-nav-direction="forward"]::view-transition-old(root) {
+  animation: 200ms ease-in both slide-out-left;
+}
+:root[data-nav-direction="forward"]::view-transition-new(root) {
+  animation: 320ms ease-out both slide-in-right;
+}
+:root[data-nav-direction="back"]::view-transition-old(root) {
+  animation: 200ms ease-in both slide-out-right;
+}
+:root[data-nav-direction="back"]::view-transition-new(root) {
+  animation: 320ms ease-out both slide-in-left;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-nav-direction="forward"]::view-transition-old(root),
+  :root[data-nav-direction="forward"]::view-transition-new(root),
+  :root[data-nav-direction="back"]::view-transition-old(root),
+  :root[data-nav-direction="back"]::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* Subtle grain to keep the flat dark/light surfaces from feeling sterile. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }

@@ -58,7 +58,14 @@ const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url);
     <ClientRouter />
   </head>
   <body class="min-h-screen font-body text-text antialiased">
+    <div id="scroll-progress" class="fixed inset-x-0 top-0 z-50 h-[3px] origin-left scale-x-0 bg-accent"></div>
     <Nav />
     <slot />
   </body>
 </html>
+
+<script>
+  import { initPageScroll } from "../lib/scroll";
+
+  document.addEventListener("astro:page-load", initPageScroll);
+</script>
