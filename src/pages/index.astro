@@ -13,7 +13,7 @@ const filters = ["All", "Web", "Mobile", "Research"] as const;
 const stats = [
   { value: "3,000+", label: "daily users on my apps" },
   { value: "IJACSA", label: "Accepted · IJACSA 2026" },
-  { value: "Flutter", label: "+ Node · TS · Postgres" },
+  { value: "Next.js", label: "+ React · Node · TypeScript" },
   { value: siteConfig.stats.enterpriseSystems, label: "enterprise systems shipped", accent: true },
 ];
 
@@ -49,10 +49,7 @@ const personJsonLd = {
         Associate Software Engineer at OREL Group. Node.js, TypeScript and Flutter, from enterprise back-office to apps used by 3,000+ people daily.
       </p>
       <div class="flex flex-wrap gap-2.5">
-        <a
-          href="#work"
-          class="rounded-pill bg-accent px-[22px] py-3.5 font-bold text-on-accent transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:scale-95"
-        >
+        <a href="#work" class="magnetic rounded-pill bg-accent px-[22px] py-3.5 font-bold text-on-accent transition-[filter] duration-200 ease-out hover:brightness-110">
           View projects
         </a>
         <DownloadCvButton />
@@ -67,7 +64,7 @@ const personJsonLd = {
     {stats.map((stat) => <StatTile value={stat.value} label={stat.label} accent={stat.accent} />)}
   </div>
 
-  <section id="work" class="mx-auto flex max-w-[1280px] flex-col gap-5 px-5 pb-20 sm:px-10">
+  <section id="work" class="mx-auto flex max-w-[1280px] scroll-mt-[104px] flex-col gap-5 px-5 pb-20 sm:px-10">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <h2 class="font-heading text-[28px] font-bold">Selected work</h2>
       <div id="work-filters" class="flex flex-wrap gap-2 text-sm">
@@ -86,15 +83,16 @@ const personJsonLd = {
         ))}
       </div>
     </div>
-    <div id="work-grid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div id="work-grid" class="bento grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {projects.map((project) => (
-        <div data-category={project.data.category} class="work-item">
+        <div data-category={project.data.category} data-slug={project.id} class="work-item flex h-full flex-col">
           <ProjectCard
             href={projectHref(project)}
             title={project.data.title}
             description={project.data.description}
             tag={project.data.tag}
             media={project.data.homeMedia}
+            transitionId={project.id}
           />
         </div>
       ))}
@@ -114,10 +112,48 @@ const personJsonLd = {
   .work-item[hidden] {
     display: none;
   }
+
+  /* Bento mosaic: only while "All" is selected (see the filter script) and
+     only once there's room for it at the xl 3-column breakpoint. */
+  @media (min-width: 1280px) {
+    #work-grid.bento {
+      grid-auto-flow: dense;
+    }
+    #work-grid.bento [data-slug="warehouse-management-system"] {
+      grid-column: span 2;
+    }
+    #work-grid.bento [data-slug="orel-mobile-suite"] {
+      grid-row: span 2;
+    }
+    #work-grid.bento [data-slug="canine-biometric-id"] {
+      grid-column: span 2;
+    }
+  }
+
+  .work-item {
+    transition:
+      opacity 0.3s ease,
+      filter 0.3s ease;
+  }
+  #work-grid:has(.work-item:hover) .work-item:not(:hover) {
+    opacity: 0.55;
+    filter: saturate(0.5);
+  }
 </style>
 
 <script>
-  import { ensureGsapRegistered, gsap, ScrollTrigger, SplitText, prefersReducedMotion, revealOnScroll, popInEach, cleanupScrollTriggers } from "../lib/animations";
+  import {
+    gsap,
+    ensureGsapRegistered,
+    ScrollTrigger,
+    prefersReducedMotion,
+    revealHeroHeading,
+    revealOnScroll,
+    popInEach,
+    animateCounters,
+    initMagnetic,
+    cleanupScrollTriggers,
+  } from "../lib/animations";
 
   function initWorkFilters() {
     const container = document.getElementById("work-filters");
@@ -126,44 +162,72 @@ const personJsonLd = {
     container.dataset.bound = "true";
 
     const chips = Array.from(container.querySelectorAll<HTMLButtonElement>("[data-filter]"));
-    const items = Array.from(grid.querySelectorAll<HTMLElement>(".work-item"));
+    let transitioning = false;
 
     chips.forEach((chip) => {
       chip.addEventListener("click", () => {
+        if (transitioning || chip.getAttribute("aria-pressed") === "true") return;
         const filter = chip.dataset.filter;
+        ensureGsapRegistered();
+
+        const reduced = prefersReducedMotion();
+        const visible = Array.from(grid.querySelectorAll<HTMLElement>(".work-item:not([hidden])"));
         chips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
-        items.forEach((item) => {
-          const show = filter === "All" || item.dataset.category === filter;
-          item.toggleAttribute("hidden", !show);
-        });
-        // Layout shifted (cards appeared/disappeared) — let ScrollTrigger recompute positions.
-        requestAnimationFrame(() => ScrollTrigger.refresh());
+
+        const swap = () => {
+          Array.from(grid.querySelectorAll<HTMLElement>(".work-item")).forEach((item) => {
+            const show = filter === "All" || item.dataset.category === filter;
+            item.toggleAttribute("hidden", !show);
+          });
+          // The mosaic spans only make sense when every card is showing.
+          grid.classList.toggle("bento", filter === "All");
+          ScrollTrigger.refresh();
+
+          const entering = Array.from(grid.querySelectorAll<HTMLElement>(".work-item:not([hidden])"));
+          if (reduced) {
+            gsap.set(entering, { autoAlpha: 1, y: 0 });
+            transitioning = false;
+            return;
+          }
+          gsap.fromTo(
+            entering,
+            { autoAlpha: 0, y: 10 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.3,
+              stagger: 0.03,
+              ease: "power2.out",
+              onComplete: () => {
+                transitioning = false;
+              },
+            },
+          );
+        };
+
+        transitioning = true;
+        if (reduced || !visible.length) {
+          swap();
+        } else {
+          gsap.to(visible, { autoAlpha: 0, y: 8, duration: 0.15, stagger: 0.015, ease: "power1.in", onComplete: swap });
+        }
       });
     });
   }
 
   function initHomeAnimations() {
     ensureGsapRegistered();
+    initMagnetic(".magnetic");
+    if (prefersReducedMotion()) return;
 
-    const heading = document.querySelector<HTMLElement>("[data-hero-heading]");
+    revealHeroHeading(document.querySelector<HTMLElement>("[data-hero-heading]"));
+
     const statTiles = document.querySelectorAll(".stat-tile");
     const workItems = document.querySelectorAll(".work-item");
-
-    if (prefersReducedMotion()) {
-      // Respect the user's preference: content is already visible, skip motion entirely.
-      return;
+    if (statTiles.length) {
+      revealOnScroll(statTiles, { y: 20, stagger: 0.08 });
+      animateCounters(document.querySelectorAll(".stat-value"));
     }
-
-    if (heading) {
-      const split = SplitText.create(heading, { type: "lines", linesClass: "line" });
-      gsap.fromTo(
-        split.lines,
-        { yPercent: 115, autoAlpha: 0 },
-        { yPercent: 0, autoAlpha: 1, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.1 },
-      );
-    }
-
-    if (statTiles.length) revealOnScroll(statTiles, { y: 20, stagger: 0.08 });
     if (workItems.length) popInEach(workItems);
   }
 
@@ -172,7 +236,6 @@ const personJsonLd = {
     initHomeAnimations();
   }
 
-  initHome();
   document.addEventListener("astro:before-swap", cleanupScrollTriggers);
   document.addEventListener("astro:page-load", initHome);
 </script>

@@ -2,10 +2,9 @@
 ---
 
 <button
-  id="sound-toggle"
   type="button"
   aria-label="Toggle sound"
-  aria-pressed="false"
+  aria-pressed="true"
   class="sound-toggle grid size-10 shrink-0 place-items-center rounded-pill border border-border-strong text-text transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent active:translate-y-0 active:scale-90"
 >
   <span class="eq" aria-hidden="true">
@@ -58,44 +57,35 @@
 </style>
 
 <script>
-  import { initSound, setSoundEnabled } from "../lib/sound";
+  import { initSound, isSoundPreferred, setSoundEnabled } from "../lib/sound";
 
-  function syncButton() {
-    const btn = document.getElementById("sound-toggle");
-    if (!btn) return;
-    let enabled = false;
-    try {
-      enabled = localStorage.getItem("sound") === "on";
-    } catch {
-      /* ignore */
-    }
-    btn.classList.toggle("is-on", enabled);
-    btn.setAttribute("aria-pressed", String(enabled));
+  function syncButtons() {
+    const enabled = isSoundPreferred();
+    document.querySelectorAll<HTMLButtonElement>(".sound-toggle").forEach((btn) => {
+      btn.classList.toggle("is-on", enabled);
+      btn.setAttribute("aria-pressed", String(enabled));
+    });
   }
 
-  function initSoundToggle() {
+  function initSoundToggles() {
     initSound();
 
-    const btn = document.getElementById("sound-toggle");
-    if (!btn || btn.dataset.bound) {
-      syncButton();
-      return;
-    }
-    btn.dataset.bound = "true";
-    btn.addEventListener("click", () => {
-      let wasEnabled = false;
-      try {
-        wasEnabled = localStorage.getItem("sound") === "on";
-        localStorage.setItem("sound", wasEnabled ? "off" : "on");
-      } catch {
-        /* ignore */
-      }
-      syncButton();
-      setSoundEnabled(!wasEnabled);
+    document.querySelectorAll<HTMLButtonElement>(".sound-toggle").forEach((btn) => {
+      if (btn.dataset.bound) return;
+      btn.dataset.bound = "true";
+      btn.addEventListener("click", () => {
+        const wasEnabled = isSoundPreferred();
+        try {
+          localStorage.setItem("sound", wasEnabled ? "off" : "on");
+        } catch {
+          /* ignore */
+        }
+        syncButtons();
+        setSoundEnabled(!wasEnabled);
+      });
     });
-    syncButton();
+    syncButtons();
   }
 
-  initSoundToggle();
-  document.addEventListener("astro:page-load", initSoundToggle);
+  document.addEventListener("astro:page-load", initSoundToggles);
 </script>

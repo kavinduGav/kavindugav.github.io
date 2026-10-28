@@ -100,7 +100,4 @@ One-time setup in the GitHub repo: **Settings → Pages → Build and deployment
 
 Tracking against the original brief — not yet done:
 - Real media (resume PDF, photos, videos, audio, research figures) — placeholders are in everywhere they're needed
-- Lenis-driven smooth scroll and the background-grid parallax (currently native CSS smooth scroll only)
-- Experience-row "line draws across, then fades in" divider animation on the About page
-- Animated layout transition on the Home work-filter (currently an instant show/hide, not an animated reflow)
-- A full Lighthouse pass against the 95+/100/100/100 mobile targets
+- A full Lighthouse pass against the 95+/100/100/100 mobile targets (the site now carries Lenis, GSAP Flip/ScrambleText/SplitText, and Howler, so this is worth checking once real media is in)

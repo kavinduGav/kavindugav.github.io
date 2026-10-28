@@ -27,12 +27,13 @@ function isActive(href: string) {
         <a
           href={link.href}
           class:list={[
-            "rounded-pill px-4 py-[9px] text-sm transition-[background-color,color,transform] duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95",
+            "nav-link rounded-pill px-4 py-[9px] text-sm transition-[background-color,color,transform] duration-200",
             link.accent
-              ? "bg-accent font-bold text-on-accent hover:brightness-110"
-              : isActive(link.href)
-                ? "bg-surface-2 text-text"
-                : "text-text-2 hover:text-text",
+              ? "magnetic bg-accent font-bold text-on-accent hover:brightness-110"
+              : [
+                  "hover:-translate-y-0.5 active:translate-y-0 active:scale-95",
+                  isActive(link.href) ? "bg-surface-2 text-text" : "text-text-2 hover:text-text",
+                ],
           ]}
           transition:name={isActive(link.href) && !link.accent ? "nav-active-pill" : undefined}
         >
@@ -48,3 +49,14 @@ function isActive(href: string) {
     <MobileMenu currentPath={currentPath} />
   </div>
 </nav>
+
+<script>
+  import { ensureGsapRegistered, initMagnetic } from "../lib/animations";
+
+  function initNavEffects() {
+    ensureGsapRegistered();
+    initMagnetic(".magnetic");
+  }
+
+  document.addEventListener("astro:page-load", initNavEffects);
+</script>
