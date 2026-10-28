@@ -1,0 +1,115 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import MediaPlaceholder from "../components/MediaPlaceholder.astro";
+import StatTile from "../components/StatTile.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { siteConfig } from "../lib/config";
+import { projects, type ProjectCategory } from "../lib/projects";
+
+const filters: Array<"All" | ProjectCategory> = ["All", "Web", "Mobile", "Research"];
+
+const stats = [
+  { value: "3,000+", label: "daily users on my apps" },
+  { value: "IJACSA", label: "Accepted · IJACSA 2026" },
+  { value: "Flutter", label: "+ Node · TS · Postgres" },
+  { value: siteConfig.stats.enterpriseSystems, label: "enterprise systems shipped", accent: true },
+];
+---
+
+<BaseLayout>
+  <header class="mx-auto grid max-w-[1280px] grid-cols-1 gap-10 px-5 py-10 sm:px-10 min-[900px]:grid-cols-2 min-[900px]:items-center min-[900px]:py-9">
+    <div class="flex flex-col gap-6">
+      <div class="flex items-center gap-2.5 font-mono text-[13px] tracking-wide text-subtle">
+        <span class="size-2 rounded-full bg-accent"></span>
+        OPEN TO WORK · {siteConfig.location}
+      </div>
+      <h1 class="font-heading text-[clamp(38px,5vw,60px)] font-extrabold uppercase leading-none tracking-[-0.03em]">
+        Backend, web &amp; mobile systems that <span class="text-accent-text">ship</span>.
+      </h1>
+      <p class="max-w-[500px] text-lg leading-[1.55] text-muted">
+        Associate Software Engineer at OREL Group. Node.js, TypeScript and Flutter, from enterprise back-office to apps used by 3,000+ people daily.
+      </p>
+      <div class="flex flex-wrap gap-2.5">
+        <a href="#work" class="rounded-pill bg-accent px-[22px] py-3.5 font-bold text-on-accent">View projects</a>
+        <a href={siteConfig.resumeUrl} download class="rounded-pill border border-border-strong px-[22px] py-3.5 font-medium text-text">
+          Download CV
+        </a>
+      </div>
+    </div>
+    <div class="rounded-[18px] border border-border bg-surface p-3.5">
+      <MediaPlaceholder aspect="16/10" icon="play" caption="showreel.mp4: 30s muted loop" />
+    </div>
+  </header>
+
+  <div class="mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-5 pb-12 sm:px-10 lg:grid-cols-4">
+    {stats.map((stat) => <StatTile value={stat.value} label={stat.label} accent={stat.accent} />)}
+  </div>
+
+  <section id="work" class="mx-auto flex max-w-[1280px] flex-col gap-5 px-5 pb-20 sm:px-10">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h2 class="font-heading text-[28px] font-bold">Selected work</h2>
+      <div id="work-filters" class="flex flex-wrap gap-2 text-sm">
+        {filters.map((f, i) => (
+          <button
+            type="button"
+            data-filter={f}
+            aria-pressed={i === 0 ? "true" : "false"}
+            class:list={[
+              "filter-chip rounded-pill border border-border-strong px-3.5 py-[7px] font-bold transition-colors",
+              i === 0 ? "bg-text text-bg" : "bg-transparent text-text-2",
+            ]}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+    </div>
+    <div id="work-grid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      {projects.map((project) => (
+        <div data-category={project.category} class="work-item">
+          <ProjectCard href={project.href} title={project.title} description={project.description} tag={project.tag} media={project.media} />
+        </div>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .filter-chip[aria-pressed="true"] {
+    background-color: var(--text);
+    color: var(--bg);
+  }
+  .filter-chip[aria-pressed="false"] {
+    background-color: transparent;
+    color: var(--text-2);
+  }
+  .work-item[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  function initWorkFilters() {
+    const container = document.getElementById("work-filters");
+    const grid = document.getElementById("work-grid");
+    if (!container || !grid || container.dataset.bound) return;
+    container.dataset.bound = "true";
+
+    const chips = Array.from(container.querySelectorAll<HTMLButtonElement>("[data-filter]"));
+    const items = Array.from(grid.querySelectorAll<HTMLElement>(".work-item"));
+
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const filter = chip.dataset.filter;
+        chips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+        items.forEach((item) => {
+          const show = filter === "All" || item.dataset.category === filter;
+          item.toggleAttribute("hidden", !show);
+        });
+      });
+    });
+  }
+
+  initWorkFilters();
+  document.addEventListener("astro:page-load", initWorkFilters);
+</script>

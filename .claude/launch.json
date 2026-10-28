@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "astro-dev",
+      "runtimeExecutable": "/Users/kavgav/.nvm/versions/node/v22.23.4/bin/node",
+      "runtimeArgs": ["node_modules/astro/bin/astro.mjs", "dev", "--port", "4321"],
+      "port": 4321
+    }
+  ]
+}

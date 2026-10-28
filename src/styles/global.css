@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+@import "@fontsource-variable/archivo/wdth.css";
+@import "@fontsource/manrope/latin-400.css";
+@import "@fontsource/manrope/latin-500.css";
+@import "@fontsource/manrope/latin-700.css";
+@import "@fontsource/jetbrains-mono/latin-400.css";
+@import "@fontsource/jetbrains-mono/latin-500.css";
+
+@theme {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-text: var(--text);
+  --color-text-2: var(--text-2);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-faint: var(--faint);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-divider: var(--divider);
+  --color-grid: var(--grid);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-on-accent: var(--on-accent);
+
+  --font-heading: "Archivo Variable", "Archivo Fallback", sans-serif;
+  --font-body: "Manrope", "Manrope Fallback", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --radius-pill: 999px;
+  --radius-card: 18px;
+  --radius-media: 12px;
+}
+
+:root {
+  /* Dark theme — the designed default. Also the fallback before JS/media resolves. */
+  --bg: #0d0e0f;
+  --surface: #151718;
+  --surface-2: #1a1c1d;
+  --text: #eeede9;
+  --text-2: #cfcfcb;
+  --muted: #a8a8a4;
+  --subtle: #9a9a96;
+  --faint: #77777a;
+  --border: #ffffff12;
+  --border-strong: #ffffff2a;
+  --divider: #ffffff14;
+  --grid: #ffffff07;
+  --accent: oklch(0.78 0.16 150);
+  --accent-text: oklch(0.78 0.16 150);
+  --on-accent: #0d0e0f;
+}
+
+/* System preference, used only while no explicit choice is stored. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --bg: #f6f5f1;
+    --surface: #ffffff;
+    --surface-2: #ecebe6;
+    --text: #111213;
+    --text-2: #1c1d1e;
+    --muted: #55554f;
+    --subtle: #6b6b64;
+    --faint: #8a8a83;
+    --border: #00000012;
+    --border-strong: #0000002a;
+    --divider: #00000014;
+    --grid: #00000007;
+    --accent: oklch(0.78 0.16 150);
+    --accent-text: oklch(0.52 0.15 150);
+    --on-accent: #0d0e0f;
+  }
+}
+
+:root[data-theme="light"] {
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --surface-2: #ecebe6;
+  --text: #111213;
+  --text-2: #1c1d1e;
+  --muted: #55554f;
+  --subtle: #6b6b64;
+  --faint: #8a8a83;
+  --border: #00000012;
+  --border-strong: #0000002a;
+  --divider: #00000014;
+  --grid: #00000007;
+  --accent: oklch(0.78 0.16 150);
+  --accent-text: oklch(0.52 0.15 150);
+  --on-accent: #0d0e0f;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0d0e0f;
+  --surface: #151718;
+  --surface-2: #1a1c1d;
+  --text: #eeede9;
+  --text-2: #cfcfcb;
+  --muted: #a8a8a4;
+  --subtle: #9a9a96;
+  --faint: #77777a;
+  --border: #ffffff12;
+  --border-strong: #ffffff2a;
+  --divider: #ffffff14;
+  --grid: #ffffff07;
+  --accent: oklch(0.78 0.16 150);
+  --accent-text: oklch(0.78 0.16 150);
+  --on-accent: #0d0e0f;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Keep the default view-transition cross-fade off the root; the theme
+   toggle drives its own circular-reveal animation on this pseudo-element. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
