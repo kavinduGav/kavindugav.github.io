@@ -86,6 +86,9 @@ export function initSmoothScroll() {
   lenis = new Lenis({
     anchors: true,
     autoRaf: false,
+    lerp: 0.22, // higher = less smoothing lag on wheel/touch; default (0.1) read as sluggish
+    duration: 0.8, // faster programmatic scrolls (anchors, syncScrollPosition)
+    wheelMultiplier: 1.15,
   });
 
   gsap.ticker.add((time) => {

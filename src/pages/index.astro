@@ -135,7 +135,7 @@ const personJsonLd = {
       opacity 0.3s ease,
       filter 0.3s ease;
   }
-  #work-grid.bento:has(.work-item:hover) .work-item:not(:hover) {
+  #work-grid:has(.work-item:hover) .work-item:not(:hover) {
     opacity: 0.55;
     filter: saturate(0.5);
   }
@@ -143,6 +143,7 @@ const personJsonLd = {
 
 <script>
   import {
+    gsap,
     ensureGsapRegistered,
     ScrollTrigger,
     prefersReducedMotion,
@@ -151,7 +152,6 @@ const personJsonLd = {
     popInEach,
     animateCounters,
     initMagnetic,
-    animateLayoutChange,
     cleanupScrollTriggers,
   } from "../lib/animations";
 
@@ -162,22 +162,55 @@ const personJsonLd = {
     container.dataset.bound = "true";
 
     const chips = Array.from(container.querySelectorAll<HTMLButtonElement>("[data-filter]"));
+    let transitioning = false;
 
     chips.forEach((chip) => {
       chip.addEventListener("click", () => {
+        if (transitioning || chip.getAttribute("aria-pressed") === "true") return;
         const filter = chip.dataset.filter;
         ensureGsapRegistered();
-        animateLayoutChange(grid, () => {
-          chips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+
+        const reduced = prefersReducedMotion();
+        const visible = Array.from(grid.querySelectorAll<HTMLElement>(".work-item:not([hidden])"));
+        chips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+
+        const swap = () => {
           Array.from(grid.querySelectorAll<HTMLElement>(".work-item")).forEach((item) => {
             const show = filter === "All" || item.dataset.category === filter;
             item.toggleAttribute("hidden", !show);
           });
           // The mosaic spans only make sense when every card is showing.
           grid.classList.toggle("bento", filter === "All");
-        });
-        // Layout shifted (cards appeared/disappeared) — let ScrollTrigger recompute positions.
-        requestAnimationFrame(() => ScrollTrigger.refresh());
+          ScrollTrigger.refresh();
+
+          const entering = Array.from(grid.querySelectorAll<HTMLElement>(".work-item:not([hidden])"));
+          if (reduced) {
+            gsap.set(entering, { autoAlpha: 1, y: 0 });
+            transitioning = false;
+            return;
+          }
+          gsap.fromTo(
+            entering,
+            { autoAlpha: 0, y: 10 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.3,
+              stagger: 0.03,
+              ease: "power2.out",
+              onComplete: () => {
+                transitioning = false;
+              },
+            },
+          );
+        };
+
+        transitioning = true;
+        if (reduced || !visible.length) {
+          swap();
+        } else {
+          gsap.to(visible, { autoAlpha: 0, y: 8, duration: 0.15, stagger: 0.015, ease: "power1.in", onComplete: swap });
+        }
       });
     });
   }

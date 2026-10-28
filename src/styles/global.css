@@ -197,16 +197,16 @@ body {
   }
 }
 :root[data-nav-direction="forward"]::view-transition-old(root) {
-  animation: 200ms ease-in both slide-out-left;
+  animation: 130ms ease-in both slide-out-left;
 }
 :root[data-nav-direction="forward"]::view-transition-new(root) {
-  animation: 320ms ease-out both slide-in-right;
+  animation: 200ms ease-out both slide-in-right;
 }
 :root[data-nav-direction="back"]::view-transition-old(root) {
-  animation: 200ms ease-in both slide-out-right;
+  animation: 130ms ease-in both slide-out-right;
 }
 :root[data-nav-direction="back"]::view-transition-new(root) {
-  animation: 320ms ease-out both slide-in-left;
+  animation: 200ms ease-out both slide-in-left;
 }
 @media (prefers-reduced-motion: reduce) {
   :root[data-nav-direction="forward"]::view-transition-old(root),

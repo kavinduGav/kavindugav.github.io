@@ -51,12 +51,11 @@ function isActive(href: string) {
 </nav>
 
 <script>
-  import { ensureGsapRegistered, initMagnetic, initScrambleOnHover } from "../lib/animations";
+  import { ensureGsapRegistered, initMagnetic } from "../lib/animations";
 
   function initNavEffects() {
     ensureGsapRegistered();
     initMagnetic(".magnetic");
-    initScrambleOnHover(".nav-link:not(.magnetic)");
   }
 
   document.addEventListener("astro:page-load", initNavEffects);
