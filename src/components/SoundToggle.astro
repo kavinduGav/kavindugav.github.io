@@ -58,6 +58,8 @@
 </style>
 
 <script>
+  import { initSound, setSoundEnabled } from "../lib/sound";
+
   function syncButton() {
     const btn = document.getElementById("sound-toggle");
     if (!btn) return;
@@ -72,6 +74,8 @@
   }
 
   function initSoundToggle() {
+    initSound();
+
     const btn = document.getElementById("sound-toggle");
     if (!btn || btn.dataset.bound) {
       syncButton();
@@ -79,15 +83,15 @@
     }
     btn.dataset.bound = "true";
     btn.addEventListener("click", () => {
-      let enabled = false;
+      let wasEnabled = false;
       try {
-        enabled = localStorage.getItem("sound") === "on";
-        localStorage.setItem("sound", enabled ? "off" : "on");
+        wasEnabled = localStorage.getItem("sound") === "on";
+        localStorage.setItem("sound", wasEnabled ? "off" : "on");
       } catch {
         /* ignore */
       }
       syncButton();
-      document.dispatchEvent(new CustomEvent("soundpref:change", { detail: { enabled: !enabled } }));
+      setSoundEnabled(!wasEnabled);
     });
     syncButton();
   }
