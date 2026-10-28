@@ -86,9 +86,9 @@ const personJsonLd = {
         ))}
       </div>
     </div>
-    <div id="work-grid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div id="work-grid" class="bento grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {projects.map((project) => (
-        <div data-category={project.data.category} class="work-item">
+        <div data-category={project.data.category} data-slug={project.id} class="work-item flex h-full flex-col">
           <ProjectCard
             href={projectHref(project)}
             title={project.data.title}
@@ -114,6 +114,33 @@ const personJsonLd = {
   .work-item[hidden] {
     display: none;
   }
+
+  /* Bento mosaic: only while "All" is selected (see the filter script) and
+     only once there's room for it at the xl 3-column breakpoint. */
+  @media (min-width: 1280px) {
+    #work-grid.bento {
+      grid-auto-flow: dense;
+    }
+    #work-grid.bento [data-slug="warehouse-management-system"] {
+      grid-column: span 2;
+    }
+    #work-grid.bento [data-slug="orel-mobile-suite"] {
+      grid-row: span 2;
+    }
+    #work-grid.bento [data-slug="canine-biometric-id"] {
+      grid-column: span 2;
+    }
+  }
+
+  .work-item {
+    transition:
+      opacity 0.3s ease,
+      filter 0.3s ease;
+  }
+  #work-grid.bento:has(.work-item:hover) .work-item:not(:hover) {
+    opacity: 0.55;
+    filter: saturate(0.5);
+  }
 </style>
 
 <script>
@@ -136,6 +163,8 @@ const personJsonLd = {
           const show = filter === "All" || item.dataset.category === filter;
           item.toggleAttribute("hidden", !show);
         });
+        // The mosaic spans only make sense when every card is showing.
+        grid.classList.toggle("bento", filter === "All");
         // Layout shifted (cards appeared/disappeared) — let ScrollTrigger recompute positions.
         requestAnimationFrame(() => ScrollTrigger.refresh());
       });
