@@ -56,6 +56,29 @@
     });
   }
 
+  /**
+   * Elements with their own transition:name (nav's active-pill/logo,
+   * project-card media) get independent view-transition groups that render
+   * in the browser's top layer, floating above everything — including the
+   * nav — regardless of z-index. That's only meant for page navigations;
+   * strip it for the theme toggle's own unrelated circular-reveal
+   * transition so only ::view-transition-*(root) animates, then restore it.
+   */
+  function suppressNamedTransitions(): () => void {
+    // Astro applies transition:name via a generated stylesheet rule keyed
+    // off this data attribute, not an inline style — so override it with an
+    // actual inline style, which wins over that rule without !important.
+    const named = Array.from(document.querySelectorAll<HTMLElement>("[data-astro-transition-scope]"));
+    named.forEach((el) => {
+      el.style.setProperty("view-transition-name", "none");
+    });
+    return () => {
+      named.forEach((el) => {
+        el.style.removeProperty("view-transition-name");
+      });
+    };
+  }
+
   function applyTheme(next: "light" | "dark", origin?: { x: number; y: number }) {
     const root = document.documentElement;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -80,6 +103,7 @@
       Math.max(origin.y, window.innerHeight - origin.y),
     );
 
+    const restoreNamedTransitions = suppressNamedTransitions();
     const transition = document.startViewTransition(commit);
     transition.ready
       .then(() =>
@@ -91,6 +115,7 @@
         ),
       )
       .catch(() => {});
+    transition.finished.finally(restoreNamedTransitions).catch(() => {});
   }
 
   function initThemeToggles() {
@@ -107,4 +132,18 @@
   }
 
   document.addEventListener("astro:page-load", initThemeToggles);
+
+  // astro:before-swap (not before-preparation) — Astro's swap reconciles
+  // <html>'s attributes to match the incoming document, and the fetched
+  // document's raw <html> tag never carries data-theme (it's only ever set
+  // client-side), so without this the theme gets wiped on every navigation.
+  // Setting it on event.newDocument here means it's already correct once
+  // that document becomes live.
+  document.addEventListener("astro:before-swap", (event) => {
+    const e = event as unknown as { newDocument: Document };
+    const theme = document.documentElement.dataset.theme;
+    if (theme === "light" || theme === "dark") {
+      e.newDocument.documentElement.dataset.theme = theme;
+    }
+  });
 </script>
