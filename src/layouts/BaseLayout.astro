@@ -59,6 +59,18 @@ const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url);
   </head>
   <body class="min-h-screen font-body text-text antialiased">
     <div id="scroll-progress" class="fixed inset-x-0 top-0 z-50 h-[3px] origin-left scale-x-0 bg-accent"></div>
+
+    <div class="packets-layer" aria-hidden="true">
+      <span class="packet h" style="top: 14%; --duration: 7.5s; --delay: 0s;"></span>
+      <span class="packet h" style="top: 38%; --duration: 9s; --delay: 3.2s;"></span>
+      <span class="packet h" style="top: 62%; --duration: 8.2s; --delay: 1.4s;"></span>
+      <span class="packet h" style="top: 84%; --duration: 10.5s; --delay: 5.6s;"></span>
+      <span class="packet v" style="left: 10%; --duration: 8.8s; --delay: 2.1s;"></span>
+      <span class="packet v" style="left: 32%; --duration: 7.2s; --delay: 6.4s;"></span>
+      <span class="packet v" style="left: 68%; --duration: 9.6s; --delay: 0.8s;"></span>
+      <span class="packet v" style="left: 91%; --duration: 8s; --delay: 4.3s;"></span>
+    </div>
+
     <Nav />
     <slot />
   </body>
