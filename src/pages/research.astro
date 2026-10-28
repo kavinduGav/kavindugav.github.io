@@ -90,7 +90,7 @@ const pipeline = [
 
 <script>
   import { siteConfig } from "../lib/config";
-  import { ensureGsapRegistered, prefersReducedMotion, gsap, SplitText, popInEach, cleanupScrollTriggers } from "../lib/animations";
+  import { ensureGsapRegistered, prefersReducedMotion, revealHeroHeading, popInEach, cleanupScrollTriggers } from "../lib/animations";
 
   function initCopyCitation() {
     const btn = document.getElementById("copy-citation");
@@ -139,21 +139,11 @@ const pipeline = [
 
   function initResearchAnimations() {
     ensureGsapRegistered();
-
-    const heading = document.querySelector<HTMLElement>("[data-hero-heading]");
-    const items = document.querySelectorAll(".reveal-item");
-
     if (prefersReducedMotion()) return;
 
-    if (heading) {
-      const split = SplitText.create(heading, { type: "lines", linesClass: "line" });
-      gsap.fromTo(
-        split.lines,
-        { yPercent: 115, autoAlpha: 0 },
-        { yPercent: 0, autoAlpha: 1, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.1 },
-      );
-    }
+    revealHeroHeading(document.querySelector<HTMLElement>("[data-hero-heading]"));
 
+    const items = document.querySelectorAll(".reveal-item");
     if (items.length) popInEach(items);
   }
 
@@ -162,7 +152,6 @@ const pipeline = [
     initResearchAnimations();
   }
 
-  initResearch();
   document.addEventListener("astro:before-swap", cleanupScrollTriggers);
   document.addEventListener("astro:page-load", initResearch);
 </script>

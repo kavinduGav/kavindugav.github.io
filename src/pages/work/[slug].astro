@@ -110,7 +110,6 @@ const contentBlocks = [
     if (items.length) popInEach(items);
   }
 
-  initProjectAnimations();
   document.addEventListener("astro:before-swap", cleanupScrollTriggers);
   document.addEventListener("astro:page-load", initProjectAnimations);
 </script>

@@ -117,7 +117,7 @@ const personJsonLd = {
 </style>
 
 <script>
-  import { ensureGsapRegistered, gsap, ScrollTrigger, SplitText, prefersReducedMotion, revealOnScroll, popInEach, cleanupScrollTriggers } from "../lib/animations";
+  import { ensureGsapRegistered, ScrollTrigger, prefersReducedMotion, revealHeroHeading, revealOnScroll, popInEach, cleanupScrollTriggers } from "../lib/animations";
 
   function initWorkFilters() {
     const container = document.getElementById("work-filters");
@@ -144,25 +144,12 @@ const personJsonLd = {
 
   function initHomeAnimations() {
     ensureGsapRegistered();
+    if (prefersReducedMotion()) return;
 
-    const heading = document.querySelector<HTMLElement>("[data-hero-heading]");
+    revealHeroHeading(document.querySelector<HTMLElement>("[data-hero-heading]"));
+
     const statTiles = document.querySelectorAll(".stat-tile");
     const workItems = document.querySelectorAll(".work-item");
-
-    if (prefersReducedMotion()) {
-      // Respect the user's preference: content is already visible, skip motion entirely.
-      return;
-    }
-
-    if (heading) {
-      const split = SplitText.create(heading, { type: "lines", linesClass: "line" });
-      gsap.fromTo(
-        split.lines,
-        { yPercent: 115, autoAlpha: 0 },
-        { yPercent: 0, autoAlpha: 1, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.1 },
-      );
-    }
-
     if (statTiles.length) revealOnScroll(statTiles, { y: 20, stagger: 0.08 });
     if (workItems.length) popInEach(workItems);
   }
@@ -172,7 +159,6 @@ const personJsonLd = {
     initHomeAnimations();
   }
 
-  initHome();
   document.addEventListener("astro:before-swap", cleanupScrollTriggers);
   document.addEventListener("astro:page-load", initHome);
 </script>
