@@ -6,6 +6,12 @@ interface Props {
 }
 
 const { value, label, accent = false } = Astro.props;
+
+// Tiles with a leading number ("3,000+", "10+") count up from 0 on scroll
+// into view; non-numeric ones ("IJACSA", "Next.js") just render as-is.
+const match = value.match(/^([\d,]+)(.*)$/);
+const countTo = match ? Number(match[1].replace(/,/g, "")) : undefined;
+const countSuffix = match ? match[2] : undefined;
 ---
 
 <div
@@ -14,6 +20,6 @@ const { value, label, accent = false } = Astro.props;
     accent ? "border-transparent bg-accent text-on-accent" : "border-border bg-surface",
   ]}
 >
-  <span class="font-heading text-[28px] font-bold">{value}</span>
+  <span class="stat-value font-heading text-[28px] font-bold" data-count-to={countTo} data-count-suffix={countSuffix}>{value}</span>
   <span class:list={["text-sm", accent ? "font-bold" : "text-subtle"]}>{label}</span>
 </div>

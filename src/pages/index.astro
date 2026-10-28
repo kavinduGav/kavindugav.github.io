@@ -49,10 +49,7 @@ const personJsonLd = {
         Associate Software Engineer at OREL Group. Node.js, TypeScript and Flutter, from enterprise back-office to apps used by 3,000+ people daily.
       </p>
       <div class="flex flex-wrap gap-2.5">
-        <a
-          href="#work"
-          class="rounded-pill bg-accent px-[22px] py-3.5 font-bold text-on-accent transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:scale-95"
-        >
+        <a href="#work" class="magnetic rounded-pill bg-accent px-[22px] py-3.5 font-bold text-on-accent transition-[filter] duration-200 ease-out hover:brightness-110">
           View projects
         </a>
         <DownloadCvButton />
@@ -144,7 +141,18 @@ const personJsonLd = {
 </style>
 
 <script>
-  import { ensureGsapRegistered, ScrollTrigger, prefersReducedMotion, revealHeroHeading, revealOnScroll, popInEach, cleanupScrollTriggers } from "../lib/animations";
+  import {
+    ensureGsapRegistered,
+    ScrollTrigger,
+    prefersReducedMotion,
+    revealHeroHeading,
+    revealOnScroll,
+    popInEach,
+    animateCounters,
+    initMagnetic,
+    animateLayoutChange,
+    cleanupScrollTriggers,
+  } from "../lib/animations";
 
   function initWorkFilters() {
     const container = document.getElementById("work-filters");
@@ -153,18 +161,20 @@ const personJsonLd = {
     container.dataset.bound = "true";
 
     const chips = Array.from(container.querySelectorAll<HTMLButtonElement>("[data-filter]"));
-    const items = Array.from(grid.querySelectorAll<HTMLElement>(".work-item"));
 
     chips.forEach((chip) => {
       chip.addEventListener("click", () => {
         const filter = chip.dataset.filter;
-        chips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
-        items.forEach((item) => {
-          const show = filter === "All" || item.dataset.category === filter;
-          item.toggleAttribute("hidden", !show);
+        ensureGsapRegistered();
+        animateLayoutChange(grid, () => {
+          chips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+          Array.from(grid.querySelectorAll<HTMLElement>(".work-item")).forEach((item) => {
+            const show = filter === "All" || item.dataset.category === filter;
+            item.toggleAttribute("hidden", !show);
+          });
+          // The mosaic spans only make sense when every card is showing.
+          grid.classList.toggle("bento", filter === "All");
         });
-        // The mosaic spans only make sense when every card is showing.
-        grid.classList.toggle("bento", filter === "All");
         // Layout shifted (cards appeared/disappeared) — let ScrollTrigger recompute positions.
         requestAnimationFrame(() => ScrollTrigger.refresh());
       });
@@ -173,13 +183,17 @@ const personJsonLd = {
 
   function initHomeAnimations() {
     ensureGsapRegistered();
+    initMagnetic(".magnetic");
     if (prefersReducedMotion()) return;
 
     revealHeroHeading(document.querySelector<HTMLElement>("[data-hero-heading]"));
 
     const statTiles = document.querySelectorAll(".stat-tile");
     const workItems = document.querySelectorAll(".work-item");
-    if (statTiles.length) revealOnScroll(statTiles, { y: 20, stagger: 0.08 });
+    if (statTiles.length) {
+      revealOnScroll(statTiles, { y: 20, stagger: 0.08 });
+      animateCounters(document.querySelectorAll(".stat-value"));
+    }
     if (workItems.length) popInEach(workItems);
   }
 
