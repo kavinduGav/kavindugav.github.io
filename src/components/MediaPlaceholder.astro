@@ -5,12 +5,18 @@ interface Props {
   caption?: string;
   icon?: "play" | "none";
   class?: string;
+  /** Shared-element transition name, for morphing into a matching placeholder on another page. */
+  transitionName?: string;
 }
 
-const { aspect = "16/10", caption, icon = "none", class: className = "" } = Astro.props;
+const { aspect = "16/10", caption, icon = "none", class: className = "", transitionName } = Astro.props;
 ---
 
-<div class:list={["media-placeholder relative flex items-end rounded-media p-3", className]} style={`aspect-ratio: ${aspect}`}>
+<div
+  class:list={["media-placeholder relative flex items-end rounded-media p-3", className]}
+  style={`aspect-ratio: ${aspect}`}
+  transition:name={transitionName}
+>
   {icon === "play" && (
     <span class="absolute inset-0 flex items-center justify-center">
       <span class="grid size-16 place-items-center rounded-full bg-accent text-2xl text-on-accent">▶</span>

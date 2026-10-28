@@ -45,15 +45,20 @@ function navTier(pathname: string): number {
 }
 
 function trackNavDirection() {
-  document.addEventListener("astro:before-preparation", (event) => {
-    const e = event as unknown as { from: URL; to: URL };
+  // astro:before-swap (not before-preparation) — Astro's swap reconciles
+  // <html>'s attributes to match the incoming document, so anything set on
+  // the *current* root here gets wiped a moment later. Setting it on
+  // event.newDocument instead means it's already there once that document
+  // becomes live, in time for the view-transition pseudo-elements to see it.
+  document.addEventListener("astro:before-swap", (event) => {
+    const e = event as unknown as { from: URL; to: URL; newDocument: Document };
     const fromTier = navTier(e.from.pathname);
     const toTier = navTier(e.to.pathname);
-    const root = document.documentElement;
+    const targetRoot = e.newDocument.documentElement;
     if (fromTier === -1 || toTier === -1 || fromTier === toTier) {
-      delete root.dataset.navDirection;
+      delete targetRoot.dataset.navDirection;
     } else {
-      root.dataset.navDirection = toTier > fromTier ? "forward" : "back";
+      targetRoot.dataset.navDirection = toTier > fromTier ? "forward" : "back";
     }
   });
 }
