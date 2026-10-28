@@ -11,11 +11,17 @@ let initialized = false;
 const AMBIENT_VOLUME = 0.35;
 const FADE_MS = 500;
 
-function getStoredPref(): boolean {
+/**
+ * Sound defaults to ON for first-time visitors; only an explicit "off"
+ * (from a previous visit) turns it off. Browsers still block audio until
+ * the visitor's first interaction on the page no matter what this says —
+ * Howler's autoUnlock retries the play() automatically once that happens.
+ */
+export function isSoundPreferred(): boolean {
   try {
-    return localStorage.getItem("sound") === "on";
+    return localStorage.getItem("sound") !== "off";
   } catch {
-    return false;
+    return true;
   }
 }
 
@@ -70,7 +76,7 @@ export function initSound() {
   initialized = true;
 
   ensureHowls();
-  enabled = getStoredPref();
+  enabled = isSoundPreferred();
   if (enabled) fadeIn();
 
   document.addEventListener("visibilitychange", () => {

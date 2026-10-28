@@ -13,7 +13,7 @@ const filters = ["All", "Web", "Mobile", "Research"] as const;
 const stats = [
   { value: "3,000+", label: "daily users on my apps" },
   { value: "IJACSA", label: "Accepted · IJACSA 2026" },
-  { value: "Flutter", label: "+ Node · TS · Postgres" },
+  { value: "Next.js", label: "+ React · Node · TypeScript" },
   { value: siteConfig.stats.enterpriseSystems, label: "enterprise systems shipped", accent: true },
 ];
 
@@ -67,7 +67,7 @@ const personJsonLd = {
     {stats.map((stat) => <StatTile value={stat.value} label={stat.label} accent={stat.accent} />)}
   </div>
 
-  <section id="work" class="mx-auto flex max-w-[1280px] flex-col gap-5 px-5 pb-20 sm:px-10">
+  <section id="work" class="mx-auto flex max-w-[1280px] scroll-mt-[104px] flex-col gap-5 px-5 pb-20 sm:px-10">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <h2 class="font-heading text-[28px] font-bold">Selected work</h2>
       <div id="work-filters" class="flex flex-wrap gap-2 text-sm">

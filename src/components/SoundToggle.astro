@@ -4,7 +4,7 @@
 <button
   type="button"
   aria-label="Toggle sound"
-  aria-pressed="false"
+  aria-pressed="true"
   class="sound-toggle grid size-10 shrink-0 place-items-center rounded-pill border border-border-strong text-text transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent active:translate-y-0 active:scale-90"
 >
   <span class="eq" aria-hidden="true">
@@ -57,15 +57,10 @@
 </style>
 
 <script>
-  import { initSound, setSoundEnabled } from "../lib/sound";
+  import { initSound, isSoundPreferred, setSoundEnabled } from "../lib/sound";
 
   function syncButtons() {
-    let enabled = false;
-    try {
-      enabled = localStorage.getItem("sound") === "on";
-    } catch {
-      /* ignore */
-    }
+    const enabled = isSoundPreferred();
     document.querySelectorAll<HTMLButtonElement>(".sound-toggle").forEach((btn) => {
       btn.classList.toggle("is-on", enabled);
       btn.setAttribute("aria-pressed", String(enabled));
@@ -79,9 +74,8 @@
       if (btn.dataset.bound) return;
       btn.dataset.bound = "true";
       btn.addEventListener("click", () => {
-        let wasEnabled = false;
+        const wasEnabled = isSoundPreferred();
         try {
-          wasEnabled = localStorage.getItem("sound") === "on";
           localStorage.setItem("sound", wasEnabled ? "off" : "on");
         } catch {
           /* ignore */
