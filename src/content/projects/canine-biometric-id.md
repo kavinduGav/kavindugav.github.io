@@ -24,4 +24,6 @@ heroCaption: "phone recording: scan to match"
 screenshots:
   - media: "figure: nose-print samples and feature map"
     caption: "Feature extraction"
+  - media: "phone recording: scan to match"
+    caption: "The app in use"
 ---

@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "Kavindu Gavesha",
   initials: "KG",
-  title: "Kavindu Gavesha — Software Engineer",
+  title: "Kavindu Gavesha · Software Engineer",
   description:
     "Associate Software Engineer building backend, full-stack and Flutter mobile systems at OREL Group, Colombo.",
   url: "https://kavindugav.github.io",
@@ -20,6 +20,8 @@ export const siteConfig = {
     // Flip to true once the IJACSA paper has a live link, and set paperUrl.
     paperPublished: false,
     paperUrl: "#",
+    citation:
+      "K. Gavesha, \"AI/ML-Based Biometric Identification for Canine Recognition,\" International Journal of Advanced Computer Science and Applications (IJACSA), accepted for publication, 2026.",
   },
   forms: {
     // Public Web3Forms access key — safe to expose client-side.

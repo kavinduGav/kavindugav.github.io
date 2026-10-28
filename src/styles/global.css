@@ -155,3 +155,10 @@ body {
   animation: none;
   mix-blend-mode: normal;
 }
+
+/* Clips SplitText's line wrappers so the hero-heading rise-in animation
+   doesn't show text poking out above its line before it settles. */
+[data-hero-heading] .line {
+  display: block;
+  overflow: hidden;
+}
