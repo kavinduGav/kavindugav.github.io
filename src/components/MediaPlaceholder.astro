@@ -1,0 +1,26 @@
+---
+interface Props {
+  /** CSS aspect-ratio value, e.g. "16/10", "4/5". */
+  aspect?: string;
+  caption?: string;
+  icon?: "play" | "none";
+  class?: string;
+}
+
+const { aspect = "16/10", caption, icon = "none", class: className = "" } = Astro.props;
+---
+
+<div class:list={["media-placeholder relative flex items-end rounded-media p-3", className]} style={`aspect-ratio: ${aspect}`}>
+  {icon === "play" && (
+    <span class="absolute inset-0 flex items-center justify-center">
+      <span class="grid size-16 place-items-center rounded-full bg-accent text-2xl text-on-accent">▶</span>
+    </span>
+  )}
+  {caption && <span class="relative font-mono text-xs text-faint">{caption}</span>}
+</div>
+
+<style>
+  .media-placeholder {
+    background-image: repeating-linear-gradient(135deg, var(--surface) 0 10px, var(--surface-2) 10px 20px);
+  }
+</style>

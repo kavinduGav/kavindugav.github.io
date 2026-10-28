@@ -1,0 +1,319 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { siteConfig } from "../lib/config";
+
+const topics = ["Full-time role", "Freelance", "Just saying hi"] as const;
+---
+
+<BaseLayout title="Contact" description="Get in touch with Kavindu Gavesha — open to full-time roles and freelance work.">
+  <div class="mx-auto grid max-w-[1280px] grid-cols-1 items-start gap-10 px-5 py-12 sm:px-10 min-[900px]:grid-cols-2 min-[900px]:py-14">
+    <div class="flex flex-col gap-6">
+      <div class="flex items-center gap-2.5 font-mono text-[13px] tracking-wide text-subtle">
+        <span class="size-2 rounded-full bg-accent"></span>
+        OPEN TO WORK · REPLIES WITHIN 24H
+      </div>
+      <h1
+        data-hero-heading
+        class="font-heading text-[clamp(40px,5.4vw,72px)] font-extrabold uppercase leading-[0.98] tracking-[-0.03em]"
+      >
+        Let's build <span class="text-accent-text">something</span>.
+      </h1>
+      <div class="flex flex-col gap-2.5">
+        <a
+          href={`mailto:${siteConfig.email}`}
+          class="flex items-center justify-between gap-3 rounded-card border border-border bg-surface px-5 py-[18px] transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent"
+        >
+          <span class="text-subtle">Email</span>
+          <span class="font-bold">{siteConfig.email}</span>
+        </a>
+        <a
+          href={siteConfig.social.linkedin}
+          target="_blank"
+          rel="noopener"
+          class="group flex items-center justify-between gap-3 rounded-card border border-border bg-surface px-5 py-[18px] transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent"
+        >
+          <span class="text-subtle">LinkedIn</span>
+          <span class="inline-flex items-center gap-1 font-bold">
+            kavindu-gavesha
+            <span class="inline-block transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
+          </span>
+        </a>
+        <a
+          href={siteConfig.social.github}
+          target="_blank"
+          rel="noopener"
+          class="group flex items-center justify-between gap-3 rounded-card border border-border bg-surface px-5 py-[18px] transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent"
+        >
+          <span class="text-subtle">GitHub</span>
+          <span class="inline-flex items-center gap-1 font-bold">
+            kavindugav
+            <span class="inline-block transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
+          </span>
+        </a>
+      </div>
+    </div>
+
+    <div class="reveal-item relative rounded-card border border-border bg-surface p-7">
+      <form id="contact-form" class="flex flex-col gap-4" novalidate>
+        <span class="font-heading text-xl font-bold">Send a message</span>
+
+        <!-- Honeypot: left blank by real visitors, auto-filled by bots. -->
+        <input type="checkbox" name="botcheck" id="botcheck" class="hidden" tabindex="-1" autocomplete="off" />
+
+        <label class="flex flex-col gap-1.5 text-[13px] text-subtle" for="contact-name">
+          Name
+          <input
+            id="contact-name"
+            name="name"
+            type="text"
+            placeholder="Your name"
+            aria-describedby="contact-name-error"
+            class="rounded-[10px] border border-[color:var(--border-strong)] bg-bg px-[14px] py-[14px] text-[15px] text-text outline-none transition-colors focus:border-accent"
+          />
+          <span id="contact-name-error" class="field-error hidden text-xs text-red-400"></span>
+        </label>
+
+        <label class="flex flex-col gap-1.5 text-[13px] text-subtle" for="contact-email">
+          Email
+          <input
+            id="contact-email"
+            name="email"
+            type="email"
+            placeholder="you@company.com"
+            aria-describedby="contact-email-error"
+            class="rounded-[10px] border border-[color:var(--border-strong)] bg-bg px-[14px] py-[14px] text-[15px] text-text outline-none transition-colors focus:border-accent"
+          />
+          <span id="contact-email-error" class="field-error hidden text-xs text-red-400"></span>
+        </label>
+
+        <div class="flex flex-col gap-1.5 text-[13px] text-subtle">
+          What's it about?
+          <div id="topic-group" role="group" aria-label="What's it about?" class="flex flex-wrap gap-2">
+            {topics.map((topic, i) => (
+              <button
+                type="button"
+                data-topic={topic}
+                aria-pressed={i === 0 ? "true" : "false"}
+                class="topic-chip rounded-pill border border-[color:var(--border-strong)] px-3.5 py-[7px] text-[13px] font-medium text-text-2 transition-[background-color,color,transform] duration-150 hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
+              >
+                {topic}
+              </button>
+            ))}
+          </div>
+          <input type="hidden" name="topic" id="contact-topic" value={topics[0]} />
+        </div>
+
+        <label class="flex flex-col gap-1.5 text-[13px] text-subtle" for="contact-message">
+          Message
+          <textarea
+            id="contact-message"
+            name="message"
+            rows="5"
+            placeholder="Tell me about the project or role"
+            aria-describedby="contact-message-error"
+            class="resize-y rounded-[10px] border border-[color:var(--border-strong)] bg-bg px-[14px] py-[14px] text-[15px] text-text outline-none transition-colors focus:border-accent"
+          ></textarea>
+          <span id="contact-message-error" class="field-error hidden text-xs text-red-400"></span>
+        </label>
+
+        <span id="form-error" class="hidden text-sm text-red-400"></span>
+
+        <button
+          type="submit"
+          id="submit-btn"
+          class="self-start rounded-pill bg-accent px-6 py-3.5 font-bold text-on-accent transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <span class="submit-label">Send message →</span>
+        </button>
+      </form>
+
+      <div id="contact-success" class="hidden flex-col items-start gap-2.5 py-10">
+        <span class="font-heading text-[26px] font-bold">Message sent.</span>
+        <span class="text-muted">Thanks, I'll get back to you soon.</span>
+        <button type="button" id="send-another" class="mt-2 cursor-pointer text-accent-text">Send another →</button>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .topic-chip[aria-pressed="true"] {
+    background-color: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+</style>
+
+<script>
+  import { siteConfig } from "../lib/config";
+  import { ensureGsapRegistered, prefersReducedMotion, gsap, SplitText, popInEach, cleanupScrollTriggers } from "../lib/animations";
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function initTopicChips() {
+    const group = document.getElementById("topic-group");
+    const hiddenInput = document.getElementById("contact-topic") as HTMLInputElement | null;
+    if (!group || !hiddenInput || group.dataset.bound) return;
+    group.dataset.bound = "true";
+
+    const chips = Array.from(group.querySelectorAll<HTMLButtonElement>(".topic-chip"));
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        chips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+        hiddenInput.value = chip.dataset.topic ?? "";
+      });
+    });
+  }
+
+  function showError(input: HTMLElement, message: string) {
+    const errorEl = document.getElementById(`${input.id}-error`);
+    input.setAttribute("aria-invalid", "true");
+    input.classList.add("border-red-400");
+    if (errorEl) {
+      errorEl.textContent = message;
+      errorEl.classList.remove("hidden");
+    }
+  }
+
+  function clearError(input: HTMLElement) {
+    const errorEl = document.getElementById(`${input.id}-error`);
+    input.removeAttribute("aria-invalid");
+    input.classList.remove("border-red-400");
+    if (errorEl) {
+      errorEl.textContent = "";
+      errorEl.classList.add("hidden");
+    }
+  }
+
+  function initContactForm() {
+    const form = document.getElementById("contact-form") as HTMLFormElement | null;
+    const successPanel = document.getElementById("contact-success");
+    const sendAnotherBtn = document.getElementById("send-another");
+    const submitBtn = document.getElementById("submit-btn") as HTMLButtonElement | null;
+    const submitLabel = submitBtn?.querySelector(".submit-label");
+    const formError = document.getElementById("form-error");
+    if (!form || !successPanel || !submitBtn || !submitLabel || !formError || form.dataset.bound) return;
+    form.dataset.bound = "true";
+
+    const nameInput = document.getElementById("contact-name") as HTMLInputElement;
+    const emailInput = document.getElementById("contact-email") as HTMLInputElement;
+    const messageInput = document.getElementById("contact-message") as HTMLTextAreaElement;
+    const botcheck = document.getElementById("botcheck") as HTMLInputElement;
+
+    [nameInput, emailInput, messageInput].forEach((el) => {
+      el.addEventListener("input", () => clearError(el));
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      formError.classList.add("hidden");
+
+      let firstInvalid: HTMLElement | null = null;
+      if (!nameInput.value.trim()) {
+        showError(nameInput, "Please enter your name.");
+        firstInvalid ??= nameInput;
+      } else {
+        clearError(nameInput);
+      }
+      if (!emailInput.value.trim() || !EMAIL_RE.test(emailInput.value.trim())) {
+        showError(emailInput, "Please enter a valid email.");
+        firstInvalid ??= emailInput;
+      } else {
+        clearError(emailInput);
+      }
+      if (!messageInput.value.trim()) {
+        showError(messageInput, "Please add a short message.");
+        firstInvalid ??= messageInput;
+      } else {
+        clearError(messageInput);
+      }
+
+      if (firstInvalid) {
+        firstInvalid.focus();
+        return;
+      }
+
+      if (botcheck.checked) {
+        // Silently "succeed" for bots without sending anything.
+        form.reset();
+        form.classList.add("hidden");
+        successPanel.classList.remove("hidden");
+        successPanel.classList.add("flex");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      const originalLabel = submitLabel.textContent;
+      submitLabel.textContent = "Sending...";
+
+      const topic = (document.getElementById("contact-topic") as HTMLInputElement).value;
+
+      try {
+        const res = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({
+            access_key: siteConfig.forms.web3formsKey,
+            name: nameInput.value.trim(),
+            email: emailInput.value.trim(),
+            topic,
+            message: messageInput.value.trim(),
+            subject: `New ${topic} inquiry from ${nameInput.value.trim()}`,
+            botcheck: false,
+          }),
+        });
+        const json = await res.json();
+
+        if (!res.ok || !json.success) throw new Error(json.message ?? "Request failed");
+
+        form.reset();
+        form.classList.add("hidden");
+        successPanel.classList.remove("hidden");
+        successPanel.classList.add("flex");
+      } catch {
+        formError.textContent = "Something went wrong sending that. Please try again.";
+        formError.classList.remove("hidden");
+      } finally {
+        submitBtn.disabled = false;
+        submitLabel.textContent = originalLabel;
+      }
+    });
+
+    sendAnotherBtn?.addEventListener("click", () => {
+      successPanel.classList.add("hidden");
+      successPanel.classList.remove("flex");
+      form.classList.remove("hidden");
+      formError.classList.add("hidden");
+    });
+  }
+
+  function initContactAnimations() {
+    ensureGsapRegistered();
+
+    const heading = document.querySelector<HTMLElement>("[data-hero-heading]");
+    const items = document.querySelectorAll(".reveal-item");
+
+    if (prefersReducedMotion()) return;
+
+    if (heading) {
+      const split = SplitText.create(heading, { type: "lines", linesClass: "line" });
+      gsap.fromTo(
+        split.lines,
+        { yPercent: 115, autoAlpha: 0 },
+        { yPercent: 0, autoAlpha: 1, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.1 },
+      );
+    }
+
+    if (items.length) popInEach(items, { start: "top 95%" });
+  }
+
+  function initContact() {
+    initTopicChips();
+    initContactForm();
+    initContactAnimations();
+  }
+
+  initContact();
+  document.addEventListener("astro:before-swap", cleanupScrollTriggers);
+  document.addEventListener("astro:page-load", initContact);
+</script>

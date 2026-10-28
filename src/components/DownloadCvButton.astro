@@ -1,0 +1,64 @@
+---
+import { siteConfig } from "../lib/config";
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+---
+
+<a
+  href={siteConfig.resumeUrl}
+  download
+  class:list={[
+    "download-cv-btn relative inline-flex items-center gap-2 overflow-hidden rounded-pill border border-border-strong px-[22px] py-3.5 font-medium text-text transition-[border-color,transform] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent active:translate-y-0 active:scale-95",
+    className,
+  ]}
+>
+  <span class="relative grid size-4 shrink-0 place-items-center">
+    <svg class="cv-icon-download absolute size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 19h16" />
+    </svg>
+    <svg class="cv-icon-check absolute size-4 text-accent-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 13l4 4L19 7" />
+    </svg>
+  </span>
+  <span>Download CV</span>
+</a>
+
+<style>
+  .download-cv-btn .cv-icon-check {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  .download-cv-btn.is-downloaded .cv-icon-download {
+    opacity: 0;
+  }
+  .download-cv-btn.is-downloaded .cv-icon-check {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .download-cv-btn .cv-icon-download,
+  .download-cv-btn .cv-icon-check {
+    transition:
+      opacity 0.25s ease,
+      transform 0.3s ease;
+  }
+</style>
+
+<script>
+  function initDownloadButtons() {
+    document.querySelectorAll<HTMLAnchorElement>(".download-cv-btn").forEach((link) => {
+      if (link.dataset.bound) return;
+      link.dataset.bound = "true";
+      link.addEventListener("click", () => {
+        link.classList.add("is-downloaded");
+        window.setTimeout(() => link.classList.remove("is-downloaded"), 1600);
+      });
+    });
+  }
+
+  initDownloadButtons();
+  document.addEventListener("astro:page-load", initDownloadButtons);
+</script>

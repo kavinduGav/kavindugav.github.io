@@ -1,0 +1,50 @@
+---
+import { siteConfig, navLinks } from "../lib/config";
+import ThemeToggle from "./ThemeToggle.astro";
+import SoundToggle from "./SoundToggle.astro";
+import MobileMenu from "./MobileMenu.astro";
+
+const currentPath = Astro.url.pathname;
+
+function isActive(href: string) {
+  if (href === "/") return currentPath === "/" || currentPath.startsWith("/work/");
+  return currentPath === href || currentPath.startsWith(`${href}/`);
+}
+---
+
+<nav class="sticky top-0 z-40 bg-bg/80 backdrop-blur">
+  <div class="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-5 py-6 sm:px-10">
+    <a
+      href="/"
+      class="font-heading text-lg font-bold uppercase tracking-tight text-text transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
+      transition:name="site-logo"
+    >
+      {siteConfig.initials}<span class="text-accent-text">.</span>
+    </a>
+
+    <div class="hidden items-center gap-2 md:flex">
+      {navLinks.map((link) => (
+        <a
+          href={link.href}
+          class:list={[
+            "rounded-pill px-4 py-[9px] text-sm transition-[background-color,color,transform] duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95",
+            link.accent
+              ? "bg-accent font-bold text-on-accent hover:brightness-110"
+              : isActive(link.href)
+                ? "bg-surface-2 text-text"
+                : "text-text-2 hover:text-text",
+          ]}
+          transition:name={isActive(link.href) && !link.accent ? "nav-active-pill" : undefined}
+        >
+          {link.label}
+        </a>
+      ))}
+      <div class="ml-2 flex items-center gap-2">
+        <ThemeToggle />
+        <SoundToggle />
+      </div>
+    </div>
+
+    <MobileMenu currentPath={currentPath} />
+  </div>
+</nav>

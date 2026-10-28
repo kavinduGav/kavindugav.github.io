@@ -1,0 +1,19 @@
+---
+interface Props {
+  value: string;
+  label: string;
+  accent?: boolean;
+}
+
+const { value, label, accent = false } = Astro.props;
+---
+
+<div
+  class:list={[
+    "stat-tile flex flex-col gap-1.5 rounded-card border p-5",
+    accent ? "border-transparent bg-accent text-on-accent" : "border-border bg-surface",
+  ]}
+>
+  <span class="font-heading text-[28px] font-bold">{value}</span>
+  <span class:list={["text-sm", accent ? "font-bold" : "text-subtle"]}>{label}</span>
+</div>

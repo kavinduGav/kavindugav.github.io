@@ -1,0 +1,114 @@
+---
+---
+
+<button
+  id="theme-toggle"
+  type="button"
+  aria-label="Toggle color theme"
+  aria-pressed="false"
+  class="theme-toggle relative grid size-10 shrink-0 place-items-center rounded-pill border border-border-strong text-text transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent active:translate-y-0 active:scale-90"
+>
+  <svg class="sun-icon absolute size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+  </svg>
+  <svg class="moon-icon absolute size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
+  </svg>
+</button>
+
+<style>
+  .sun-icon,
+  .moon-icon {
+    transition:
+      opacity 0.35s ease,
+      transform 0.45s ease;
+  }
+  .moon-icon {
+    opacity: 0;
+    transform: rotate(-80deg) scale(0.4);
+  }
+  .sun-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+  .theme-toggle.is-light .sun-icon {
+    opacity: 0;
+    transform: rotate(80deg) scale(0.4);
+  }
+  .theme-toggle.is-light .moon-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+</style>
+
+<script>
+  function resolvedTheme(): "light" | "dark" {
+    const stored = document.documentElement.dataset.theme;
+    if (stored === "light" || stored === "dark") return stored;
+    return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  }
+
+  function syncButton() {
+    const btn = document.getElementById("theme-toggle");
+    if (!btn) return;
+    const isLight = resolvedTheme() === "light";
+    btn.classList.toggle("is-light", isLight);
+    btn.setAttribute("aria-pressed", String(isLight));
+  }
+
+  function applyTheme(next: "light" | "dark", origin?: { x: number; y: number }) {
+    const root = document.documentElement;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const commit = () => {
+      root.dataset.theme = next;
+      try {
+        localStorage.setItem("theme", next);
+      } catch {
+        /* storage unavailable (private mode, etc.) — theme just won't persist */
+      }
+      syncButton();
+    };
+
+    if (reduceMotion || !document.startViewTransition || !origin) {
+      commit();
+      return;
+    }
+
+    const endRadius = Math.hypot(
+      Math.max(origin.x, window.innerWidth - origin.x),
+      Math.max(origin.y, window.innerHeight - origin.y),
+    );
+
+    const transition = document.startViewTransition(commit);
+    transition.ready
+      .then(() =>
+        document.documentElement.animate(
+          {
+            clipPath: [`circle(0px at ${origin.x}px ${origin.y}px)`, `circle(${endRadius}px at ${origin.x}px ${origin.y}px)`],
+          },
+          { duration: 480, easing: "ease-in-out", pseudoElement: "::view-transition-new(root)" },
+        ),
+      )
+      .catch(() => {});
+  }
+
+  function initThemeToggle() {
+    const btn = document.getElementById("theme-toggle");
+    if (!btn || btn.dataset.bound) {
+      syncButton();
+      return;
+    }
+    btn.dataset.bound = "true";
+    btn.addEventListener("click", () => {
+      const next = resolvedTheme() === "light" ? "dark" : "light";
+      const rect = btn.getBoundingClientRect();
+      applyTheme(next, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+    });
+    syncButton();
+  }
+
+  initThemeToggle();
+  document.addEventListener("astro:page-load", initThemeToggle);
+</script>

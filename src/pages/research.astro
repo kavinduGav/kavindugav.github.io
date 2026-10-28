@@ -1,0 +1,168 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ScreenshotFigure from "../components/ScreenshotFigure.astro";
+import { siteConfig } from "../lib/config";
+import { getEntry } from "astro:content";
+
+const canine = await getEntry("projects", "canine-biometric-id");
+const screenshots = canine?.data.screenshots ?? [];
+
+const pipeline = [
+  { step: "01", title: "Capture", text: "Nose-print photo from the Flutter app" },
+  { step: "02", title: "Pre-process", text: "Crop, normalise and enhance ridge patterns" },
+  { step: "03", title: "Classify", text: "Supervised ML model served via FastAPI" },
+  { step: "04", title: "Act", text: "AI agents + n8n notify owners and update records" },
+];
+---
+
+<BaseLayout
+  title="Research"
+  description="AI/ML-based biometric identification for canine recognition, accepted for publication in IJACSA 2026."
+>
+  <header class="mx-auto flex max-w-[1280px] flex-col gap-5 px-5 py-10 sm:px-10">
+    <div class="flex flex-wrap gap-2 text-sm">
+      <span class="rounded-pill bg-accent px-3 py-1.5 font-bold text-on-accent">IJACSA · Accepted 2026</span>
+      <span class="rounded-pill border border-border-strong px-3 py-1.5">Final-year research · SLIIT</span>
+    </div>
+    <h1
+      data-hero-heading
+      class="max-w-[1000px] font-heading text-[clamp(32px,4.4vw,56px)] font-extrabold leading-[1.05] tracking-[-0.03em]"
+    >
+      AI/ML-based biometric identification for <span class="text-accent-text">canine recognition</span>
+    </h1>
+    <p class="max-w-[720px] text-lg leading-[1.6] text-muted">
+      Every dog's nose-print is unique, like a fingerprint. This research identifies dogs from a phone photo using
+      image processing and supervised ML, wrapped in a Flutter app with AI agents and n8n automation.
+    </p>
+    <div class="flex flex-wrap gap-2.5">
+      {
+        siteConfig.research.paperPublished ? (
+          <a
+            href={siteConfig.research.paperUrl}
+            target="_blank"
+            rel="noopener"
+            class="rounded-pill bg-accent px-[22px] py-3.5 font-bold text-on-accent transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:scale-95"
+          >
+            Read the paper ↗
+          </a>
+        ) : (
+          <span
+            aria-disabled="true"
+            class="cursor-not-allowed rounded-pill bg-accent/40 px-[22px] py-3.5 font-bold text-on-accent/60"
+          >
+            Paper coming soon
+          </span>
+        )
+      }
+      <button
+        type="button"
+        id="copy-citation"
+        class="relative rounded-pill border border-border-strong px-[22px] py-3.5 font-medium text-text transition-[border-color,transform] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent active:translate-y-0 active:scale-95"
+      >
+        <span class="copy-label">Copy citation</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="mx-auto flex max-w-[1280px] flex-col gap-5 px-5 pb-14 sm:px-10">
+    <h2 class="font-heading text-[28px] font-bold">Pipeline</h2>
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {pipeline.map((p) => (
+        <div class="reveal-item flex flex-col gap-2 rounded-card border border-border bg-surface p-5">
+          <span class="font-mono text-xs text-accent-text">{p.step}</span>
+          <span class="text-[17px] font-bold">{p.title}</span>
+          <span class="text-sm text-subtle">{p.text}</span>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="mx-auto grid max-w-[1280px] grid-cols-1 gap-4 px-5 pb-18 sm:grid-cols-2 sm:px-10">
+    {screenshots.map((shot) => <ScreenshotFigure media={shot.media} caption={shot.caption} />)}
+  </section>
+</BaseLayout>
+
+<style>
+  #copy-citation.is-copied .copy-label {
+    color: var(--accent-text);
+  }
+</style>
+
+<script>
+  import { siteConfig } from "../lib/config";
+  import { ensureGsapRegistered, prefersReducedMotion, gsap, SplitText, popInEach, cleanupScrollTriggers } from "../lib/animations";
+
+  function initCopyCitation() {
+    const btn = document.getElementById("copy-citation");
+    const label = btn?.querySelector(".copy-label");
+    if (!btn || !label || btn.dataset.bound) return;
+    btn.dataset.bound = "true";
+
+    const defaultText = label.textContent ?? "Copy citation";
+
+    function legacyCopy(text: string): boolean {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      let ok = false;
+      try {
+        ok = document.execCommand("copy");
+      } catch {
+        ok = false;
+      }
+      textarea.remove();
+      return ok;
+    }
+
+    btn.addEventListener("click", async () => {
+      let copied = false;
+      try {
+        await navigator.clipboard.writeText(siteConfig.research.citation);
+        copied = true;
+      } catch {
+        copied = legacyCopy(siteConfig.research.citation);
+      }
+      if (!copied) return;
+
+      btn.classList.add("is-copied");
+      label.textContent = "Copied";
+      window.setTimeout(() => {
+        btn.classList.remove("is-copied");
+        label.textContent = defaultText;
+      }, 1600);
+    });
+  }
+
+  function initResearchAnimations() {
+    ensureGsapRegistered();
+
+    const heading = document.querySelector<HTMLElement>("[data-hero-heading]");
+    const items = document.querySelectorAll(".reveal-item");
+
+    if (prefersReducedMotion()) return;
+
+    if (heading) {
+      const split = SplitText.create(heading, { type: "lines", linesClass: "line" });
+      gsap.fromTo(
+        split.lines,
+        { yPercent: 115, autoAlpha: 0 },
+        { yPercent: 0, autoAlpha: 1, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.1 },
+      );
+    }
+
+    if (items.length) popInEach(items);
+  }
+
+  function initResearch() {
+    initCopyCitation();
+    initResearchAnimations();
+  }
+
+  initResearch();
+  document.addEventListener("astro:before-swap", cleanupScrollTriggers);
+  document.addEventListener("astro:page-load", initResearch);
+</script>
