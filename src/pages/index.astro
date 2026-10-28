@@ -23,16 +23,37 @@ const stats = [
         <span class="size-2 rounded-full bg-accent"></span>
         OPEN TO WORK · {siteConfig.location}
       </div>
-      <h1 class="font-heading text-[clamp(38px,5vw,60px)] font-extrabold uppercase leading-none tracking-[-0.03em]">
+      <h1
+        data-hero-heading
+        class="font-heading text-[clamp(38px,5vw,60px)] font-extrabold uppercase leading-none tracking-[-0.03em]"
+      >
         Backend, web &amp; mobile systems that <span class="text-accent-text">ship</span>.
       </h1>
       <p class="max-w-[500px] text-lg leading-[1.55] text-muted">
         Associate Software Engineer at OREL Group. Node.js, TypeScript and Flutter, from enterprise back-office to apps used by 3,000+ people daily.
       </p>
       <div class="flex flex-wrap gap-2.5">
-        <a href="#work" class="rounded-pill bg-accent px-[22px] py-3.5 font-bold text-on-accent">View projects</a>
-        <a href={siteConfig.resumeUrl} download class="rounded-pill border border-border-strong px-[22px] py-3.5 font-medium text-text">
-          Download CV
+        <a
+          href="#work"
+          class="rounded-pill bg-accent px-[22px] py-3.5 font-bold text-on-accent transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:scale-95"
+        >
+          View projects
+        </a>
+        <a
+          href={siteConfig.resumeUrl}
+          download
+          id="download-cv"
+          class="relative inline-flex items-center gap-2 overflow-hidden rounded-pill border border-border-strong px-[22px] py-3.5 font-medium text-text transition-[border-color,transform] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent active:translate-y-0 active:scale-95"
+        >
+          <span class="relative grid size-4 shrink-0 place-items-center">
+            <svg class="cv-icon-download absolute size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 19h16" />
+            </svg>
+            <svg class="cv-icon-check absolute size-4 text-accent-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 13l4 4L19 7" />
+            </svg>
+          </span>
+          <span>Download CV</span>
         </a>
       </div>
     </div>
@@ -41,7 +62,7 @@ const stats = [
     </div>
   </header>
 
-  <div class="mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-5 pb-12 sm:px-10 lg:grid-cols-4">
+  <div id="stats-grid" class="mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-5 pb-12 sm:px-10 lg:grid-cols-4">
     {stats.map((stat) => <StatTile value={stat.value} label={stat.label} accent={stat.accent} />)}
   </div>
 
@@ -55,7 +76,7 @@ const stats = [
             data-filter={f}
             aria-pressed={i === 0 ? "true" : "false"}
             class:list={[
-              "filter-chip rounded-pill border border-border-strong px-3.5 py-[7px] font-bold transition-colors",
+              "filter-chip rounded-pill border border-border-strong px-3.5 py-[7px] font-bold transition-[background-color,color,transform] duration-150 hover:-translate-y-0.5 active:translate-y-0 active:scale-95",
               i === 0 ? "bg-text text-bg" : "bg-transparent text-text-2",
             ]}
           >
@@ -86,9 +107,34 @@ const stats = [
   .work-item[hidden] {
     display: none;
   }
+
+  :global([data-hero-heading] .line) {
+    overflow: hidden;
+    display: block;
+  }
+
+  #download-cv .cv-icon-check {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  #download-cv.is-downloaded .cv-icon-download {
+    opacity: 0;
+  }
+  #download-cv.is-downloaded .cv-icon-check {
+    opacity: 1;
+    transform: scale(1);
+  }
+  #download-cv .cv-icon-download,
+  #download-cv .cv-icon-check {
+    transition:
+      opacity 0.25s ease,
+      transform 0.3s ease;
+  }
 </style>
 
 <script>
+  import { ensureGsapRegistered, gsap, ScrollTrigger, SplitText, prefersReducedMotion, revealOnScroll, popInEach, cleanupScrollTriggers } from "../lib/animations";
+
   function initWorkFilters() {
     const container = document.getElementById("work-filters");
     const grid = document.getElementById("work-grid");
@@ -106,10 +152,55 @@ const stats = [
           const show = filter === "All" || item.dataset.category === filter;
           item.toggleAttribute("hidden", !show);
         });
+        // Layout shifted (cards appeared/disappeared) — let ScrollTrigger recompute positions.
+        requestAnimationFrame(() => ScrollTrigger.refresh());
       });
     });
   }
 
-  initWorkFilters();
-  document.addEventListener("astro:page-load", initWorkFilters);
+  function initDownloadFeedback() {
+    const link = document.getElementById("download-cv");
+    if (!link || link.dataset.bound) return;
+    link.dataset.bound = "true";
+
+    link.addEventListener("click", () => {
+      link.classList.add("is-downloaded");
+      window.setTimeout(() => link.classList.remove("is-downloaded"), 1600);
+    });
+  }
+
+  function initHomeAnimations() {
+    ensureGsapRegistered();
+
+    const heading = document.querySelector<HTMLElement>("[data-hero-heading]");
+    const statTiles = document.querySelectorAll(".stat-tile");
+    const workItems = document.querySelectorAll(".work-item");
+
+    if (prefersReducedMotion()) {
+      // Respect the user's preference: content is already visible, skip motion entirely.
+      return;
+    }
+
+    if (heading) {
+      const split = SplitText.create(heading, { type: "lines", linesClass: "line" });
+      gsap.fromTo(
+        split.lines,
+        { yPercent: 115, autoAlpha: 0 },
+        { yPercent: 0, autoAlpha: 1, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.1 },
+      );
+    }
+
+    if (statTiles.length) revealOnScroll(statTiles, { y: 20, stagger: 0.08 });
+    if (workItems.length) popInEach(workItems);
+  }
+
+  function initHome() {
+    initWorkFilters();
+    initDownloadFeedback();
+    initHomeAnimations();
+  }
+
+  initHome();
+  document.addEventListener("astro:before-swap", cleanupScrollTriggers);
+  document.addEventListener("astro:page-load", initHome);
 </script>

@@ -6,26 +6,39 @@
   type="button"
   aria-label="Toggle color theme"
   aria-pressed="false"
-  class="theme-toggle grid size-10 shrink-0 place-items-center rounded-pill border border-border-strong text-text transition-colors hover:border-accent"
+  class="theme-toggle relative grid size-10 shrink-0 place-items-center rounded-pill border border-border-strong text-text transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent active:translate-y-0 active:scale-90"
 >
-  <svg class="sun-icon size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+  <svg class="sun-icon absolute size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
     <circle cx="12" cy="12" r="4" />
     <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
   </svg>
-  <svg class="moon-icon size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <svg class="moon-icon absolute size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
   </svg>
 </button>
 
 <style>
+  .sun-icon,
   .moon-icon {
-    display: none;
+    transition:
+      opacity 0.35s ease,
+      transform 0.45s ease;
+  }
+  .moon-icon {
+    opacity: 0;
+    transform: rotate(-80deg) scale(0.4);
+  }
+  .sun-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
   }
   .theme-toggle.is-light .sun-icon {
-    display: none;
+    opacity: 0;
+    transform: rotate(80deg) scale(0.4);
   }
   .theme-toggle.is-light .moon-icon {
-    display: block;
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
   }
 </style>
 
