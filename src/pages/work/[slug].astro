@@ -1,0 +1,116 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import MediaPlaceholder from "../../components/MediaPlaceholder.astro";
+import ScreenshotFigure from "../../components/ScreenshotFigure.astro";
+import { getCaseStudyProjects, getNextCaseStudy, projectHref } from "../../lib/projects";
+
+export async function getStaticPaths() {
+  const caseStudies = await getCaseStudyProjects();
+  return caseStudies.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const next = await getNextCaseStudy(entry.id);
+
+const titleWords = data.title.split(" ");
+const lastWord = titleWords.pop();
+
+const infoTiles = [
+  { label: "ROLE", value: data.role },
+  { label: "COMPANY", value: data.company },
+  { label: "TIMELINE", value: data.timeline },
+  { label: "PLATFORMS", value: data.platforms },
+];
+
+const contentBlocks = [
+  { step: "01 · PROBLEM", text: data.problem },
+  { step: "02 · APPROACH", text: data.approach },
+  { step: "03 · OUTCOME", text: data.outcome },
+];
+---
+
+<BaseLayout title={data.title} description={data.summary}>
+  <header class="mx-auto flex flex-col gap-5 px-5 py-8 sm:px-10">
+    <a
+      href="/#work"
+      class="w-fit font-mono text-[13px] text-subtle transition-[color,transform] duration-150 hover:-translate-x-0.5 hover:text-text"
+    >
+      ← all work / {data.category.toLowerCase()}
+    </a>
+    <h1 class="max-w-[960px] font-heading text-[clamp(36px,5vw,64px)] font-extrabold uppercase leading-none tracking-[-0.03em]">
+      {titleWords.join(" ")} <span class="text-accent-text">{lastWord}</span>
+    </h1>
+    <p class="max-w-[680px] text-lg leading-[1.55] text-muted">{data.summary}</p>
+    <div class="mt-1.5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {infoTiles.map((tile) => (
+        <div class="flex flex-col gap-1 rounded-card border border-border bg-surface px-[18px] py-4">
+          <span class="font-mono text-xs text-faint">{tile.label}</span>
+          <span class="font-bold text-text">{tile.value}</span>
+        </div>
+      ))}
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-[1280px] px-5 pb-10 sm:px-10">
+    <div class="rounded-[20px] border border-border bg-surface p-3.5" data-reveal>
+      <MediaPlaceholder aspect="16/8" icon="play" caption={data.heroCaption} />
+    </div>
+  </div>
+
+  <section class="mx-auto grid max-w-[1280px] grid-cols-1 gap-4 px-5 pb-16 sm:grid-cols-2 sm:px-10 lg:grid-cols-3">
+    {contentBlocks.map((block) => (
+      <div class="reveal-item flex flex-col gap-3 rounded-card border border-border bg-surface p-[26px]">
+        <span class="font-heading text-sm text-accent-text">{block.step}</span>
+        <p class="text-base leading-[1.6] text-text-2">{block.text}</p>
+      </div>
+    ))}
+  </section>
+
+  <section class="mx-auto flex max-w-[1280px] flex-col gap-5 px-5 pb-16 sm:px-10">
+    <h2 class="font-heading text-[28px] font-bold">Screens</h2>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {data.screenshots.map((shot) => (
+        <ScreenshotFigure media={shot.media} caption={shot.caption} wide={shot.wide} />
+      ))}
+    </div>
+  </section>
+
+  <section class="mx-auto flex max-w-[1280px] flex-col gap-4 px-5 pb-16 sm:px-10">
+    <h2 class="font-heading text-[28px] font-bold">Built with</h2>
+    <div class="flex flex-wrap gap-2 text-sm">
+      {data.tech.map((item) => (
+        <span class="rounded-pill border border-accent-text px-3.5 py-2 text-accent-text">{item}</span>
+      ))}
+    </div>
+  </section>
+
+  <a
+    href={projectHref(next)}
+    class="mx-5 mb-16 flex flex-wrap items-center justify-between gap-5 rounded-[20px] border border-border bg-surface p-7 transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent sm:mx-10"
+  >
+    <div>
+      <div class="font-mono text-xs text-faint">NEXT PROJECT</div>
+      <div class="mt-1.5 font-heading text-[26px] font-bold">{next.data.title}</div>
+    </div>
+    <span class="grid size-[52px] flex-none place-items-center rounded-full bg-accent text-xl text-on-accent">→</span>
+  </a>
+</BaseLayout>
+
+<script>
+  import { ensureGsapRegistered, prefersReducedMotion, revealOnScroll, popInEach, cleanupScrollTriggers } from "../../lib/animations";
+
+  function initProjectAnimations() {
+    ensureGsapRegistered();
+    if (prefersReducedMotion()) return;
+
+    const hero = document.querySelector<HTMLElement>("[data-reveal]");
+    const items = document.querySelectorAll(".reveal-item");
+    if (hero) revealOnScroll([hero], { y: 16, start: "top 90%" });
+    if (items.length) popInEach(items);
+  }
+
+  initProjectAnimations();
+  document.addEventListener("astro:before-swap", cleanupScrollTriggers);
+  document.addEventListener("astro:page-load", initProjectAnimations);
+</script>

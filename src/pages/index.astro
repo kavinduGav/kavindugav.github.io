@@ -4,9 +4,10 @@ import MediaPlaceholder from "../components/MediaPlaceholder.astro";
 import StatTile from "../components/StatTile.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import { siteConfig } from "../lib/config";
-import { projects, type ProjectCategory } from "../lib/projects";
+import { getOrderedProjects, projectHref } from "../lib/projects";
 
-const filters: Array<"All" | ProjectCategory> = ["All", "Web", "Mobile", "Research"];
+const projects = await getOrderedProjects();
+const filters = ["All", "Web", "Mobile", "Research"] as const;
 
 const stats = [
   { value: "3,000+", label: "daily users on my apps" },
@@ -87,8 +88,14 @@ const stats = [
     </div>
     <div id="work-grid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {projects.map((project) => (
-        <div data-category={project.category} class="work-item">
-          <ProjectCard href={project.href} title={project.title} description={project.description} tag={project.tag} media={project.media} />
+        <div data-category={project.data.category} class="work-item">
+          <ProjectCard
+            href={projectHref(project)}
+            title={project.data.title}
+            description={project.data.description}
+            tag={project.data.tag}
+            media={project.data.homeMedia}
+          />
         </div>
       ))}
     </div>

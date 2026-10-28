@@ -6,6 +6,12 @@
       "runtimeExecutable": "/Users/kavgav/.nvm/versions/node/v22.23.4/bin/node",
       "runtimeArgs": ["node_modules/astro/bin/astro.mjs", "dev", "--port", "4321"],
       "port": 4321
+    },
+    {
+      "name": "astro-preview",
+      "runtimeExecutable": "/Users/kavgav/.nvm/versions/node/v22.23.4/bin/node",
+      "runtimeArgs": ["node_modules/astro/bin/astro.mjs", "preview", "--port", "4323"],
+      "port": 4323
     }
   ]
 }
