@@ -2,7 +2,6 @@
 ---
 
 <button
-  id="theme-toggle"
   type="button"
   aria-label="Toggle color theme"
   aria-pressed="false"
@@ -49,12 +48,12 @@
     return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
   }
 
-  function syncButton() {
-    const btn = document.getElementById("theme-toggle");
-    if (!btn) return;
+  function syncButtons() {
     const isLight = resolvedTheme() === "light";
-    btn.classList.toggle("is-light", isLight);
-    btn.setAttribute("aria-pressed", String(isLight));
+    document.querySelectorAll<HTMLButtonElement>(".theme-toggle").forEach((btn) => {
+      btn.classList.toggle("is-light", isLight);
+      btn.setAttribute("aria-pressed", String(isLight));
+    });
   }
 
   function applyTheme(next: "light" | "dark", origin?: { x: number; y: number }) {
@@ -68,7 +67,7 @@
       } catch {
         /* storage unavailable (private mode, etc.) — theme just won't persist */
       }
-      syncButton();
+      syncButtons();
     };
 
     if (reduceMotion || !document.startViewTransition || !origin) {
@@ -94,21 +93,18 @@
       .catch(() => {});
   }
 
-  function initThemeToggle() {
-    const btn = document.getElementById("theme-toggle");
-    if (!btn || btn.dataset.bound) {
-      syncButton();
-      return;
-    }
-    btn.dataset.bound = "true";
-    btn.addEventListener("click", () => {
-      const next = resolvedTheme() === "light" ? "dark" : "light";
-      const rect = btn.getBoundingClientRect();
-      applyTheme(next, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+  function initThemeToggles() {
+    document.querySelectorAll<HTMLButtonElement>(".theme-toggle").forEach((btn) => {
+      if (btn.dataset.bound) return;
+      btn.dataset.bound = "true";
+      btn.addEventListener("click", () => {
+        const next = resolvedTheme() === "light" ? "dark" : "light";
+        const rect = btn.getBoundingClientRect();
+        applyTheme(next, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+      });
     });
-    syncButton();
+    syncButtons();
   }
 
-  initThemeToggle();
-  document.addEventListener("astro:page-load", initThemeToggle);
+  document.addEventListener("astro:page-load", initThemeToggles);
 </script>

@@ -2,7 +2,6 @@
 ---
 
 <button
-  id="sound-toggle"
   type="button"
   aria-label="Toggle sound"
   aria-pressed="false"
@@ -60,42 +59,39 @@
 <script>
   import { initSound, setSoundEnabled } from "../lib/sound";
 
-  function syncButton() {
-    const btn = document.getElementById("sound-toggle");
-    if (!btn) return;
+  function syncButtons() {
     let enabled = false;
     try {
       enabled = localStorage.getItem("sound") === "on";
     } catch {
       /* ignore */
     }
-    btn.classList.toggle("is-on", enabled);
-    btn.setAttribute("aria-pressed", String(enabled));
+    document.querySelectorAll<HTMLButtonElement>(".sound-toggle").forEach((btn) => {
+      btn.classList.toggle("is-on", enabled);
+      btn.setAttribute("aria-pressed", String(enabled));
+    });
   }
 
-  function initSoundToggle() {
+  function initSoundToggles() {
     initSound();
 
-    const btn = document.getElementById("sound-toggle");
-    if (!btn || btn.dataset.bound) {
-      syncButton();
-      return;
-    }
-    btn.dataset.bound = "true";
-    btn.addEventListener("click", () => {
-      let wasEnabled = false;
-      try {
-        wasEnabled = localStorage.getItem("sound") === "on";
-        localStorage.setItem("sound", wasEnabled ? "off" : "on");
-      } catch {
-        /* ignore */
-      }
-      syncButton();
-      setSoundEnabled(!wasEnabled);
+    document.querySelectorAll<HTMLButtonElement>(".sound-toggle").forEach((btn) => {
+      if (btn.dataset.bound) return;
+      btn.dataset.bound = "true";
+      btn.addEventListener("click", () => {
+        let wasEnabled = false;
+        try {
+          wasEnabled = localStorage.getItem("sound") === "on";
+          localStorage.setItem("sound", wasEnabled ? "off" : "on");
+        } catch {
+          /* ignore */
+        }
+        syncButtons();
+        setSoundEnabled(!wasEnabled);
+      });
     });
-    syncButton();
+    syncButtons();
   }
 
-  initSoundToggle();
-  document.addEventListener("astro:page-load", initSoundToggle);
+  document.addEventListener("astro:page-load", initSoundToggles);
 </script>
